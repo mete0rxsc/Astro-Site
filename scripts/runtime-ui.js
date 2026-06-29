@@ -737,7 +737,7 @@
 
 	const closeToast = (toast) => {
 		if (!toast) return;
-		toast.classList.remove("is-visible", "has-action");
+		toast.classList.remove("is-visible", "has-action", "is-persistent");
 		toast.querySelector(".mete0r-toast-actions")?.remove();
 		delete toast.dataset.toastMode;
 	};
@@ -763,7 +763,8 @@
 		}
 		toast.dataset.toastMode = options.mode || "";
 		toast.style.setProperty("--toast-duration", `${safeDuration}ms`);
-		toast.classList.remove("is-visible", "has-action");
+		toast.classList.remove("is-visible", "has-action", "is-persistent");
+		toast.classList.toggle("is-persistent", options.persistent === true);
 		toast.querySelector(".mete0r-toast-actions")?.remove();
 		const actions = Array.isArray(options.actions) ? options.actions : options.actionText ? [{
 			text: options.actionText,
@@ -779,9 +780,9 @@
 				action.className = `mete0r-toast-action${item.variant ? ` is-${item.variant}` : ""}`;
 				action.textContent = item.text || "";
 				action.addEventListener("click", () => {
-					item.onClick?.();
 					window.clearTimeout(state.toastTimer);
 					closeToast(toast);
+					item.onClick?.();
 				});
 				actionsWrap.appendChild(action);
 			});
@@ -791,14 +792,16 @@
 		if (progress) {
 			progress.style.animation = "none";
 			progress.offsetHeight;
-			progress.style.animation = "";
+			progress.style.animation = options.persistent === true ? "none" : "";
 		}
 		window.clearTimeout(state.toastTimer);
 		requestAnimationFrame(() => toast.classList.add("is-visible"));
-		state.toastTimer = window.setTimeout(() => {
-			options.onAutoClose?.();
-			closeToast(toast);
-		}, safeDuration);
+		if (options.persistent !== true) {
+			state.toastTimer = window.setTimeout(() => {
+				options.onAutoClose?.();
+				closeToast(toast);
+			}, safeDuration);
+		}
 		return toast;
 	};
 
@@ -853,16 +856,18 @@
 		const reject = () => {
 			state.policyImagesRejected = true;
 			applyPolicyImageRejection();
-			showToast(POLICY_CONSENT_CONFIG.rejectToast || "已按您的选择移除站内图片元素。", 5000);
-		};		const privacyLink = `<a href="${escapeHtml(privacyUrl)}">隐私政策</a>`;
+			showToast(POLICY_CONSENT_CONFIG.rejectToast || "已按您的选择移除站内图片元素。刷新即可重置状态。", 5000);
+		};
+		const privacyLink = `<a href="${escapeHtml(privacyUrl)}">隐私政策</a>`;
 		const copyrightLink = `<a href="${escapeHtml(copyrightUrl)}">版权政策</a>`;
-		const messageTemplate = POLICY_CONSENT_CONFIG.message || "继续访问本站即表示您已阅读并同意 {privacy} 与 {copyright}。<strong>20秒后自动同意</strong>";
+		const messageTemplate = POLICY_CONSENT_CONFIG.message || "继续访问本站前，请阅读并选择是否同意 {privacy} 与 {copyright}。";
 		const message = messageTemplate
 			.replaceAll("{privacy}", privacyLink)
 			.replaceAll("{copyright}", copyrightLink);
 		showToast(message, Number(POLICY_CONSENT_CONFIG.durationMs || 20000), {
 			html: true,
 			mode: "policy",
+			persistent: true,
 			actions: [
 				{
 					text: POLICY_CONSENT_CONFIG.rejectButtonText || "拒绝",
@@ -874,7 +879,6 @@
 					onClick: accept,
 				},
 			],
-			onAutoClose: accept,
 		});
 	};
 
@@ -1045,6 +1049,27 @@
 		}
 	};
 
+	const readCssPx = (name, fallback = 0) => {
+		const value = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name));
+		return Number.isFinite(value) ? value : fallback;
+	};
+
+	const syncDesktopTocPosition = () => {
+		const article = document.querySelector(".article-main-column") || document.querySelector(".article-body");
+		const header = document.querySelector(".site-header");
+		if (!article) return;
+		const articleRect = article.getBoundingClientRect();
+		const headerRect = header?.getBoundingClientRect();
+		const gap = readCssPx("--toc-gap", 24);
+		const headerGap = readCssPx("--toc-header-gap", 12);
+		const top = Math.max(16, (headerRect?.bottom ?? 0) + headerGap);
+		document.querySelectorAll(".article-content-shell > .toc-bar").forEach((toc) => {
+			toc.style.left = `${Math.round(articleRect.right + gap)}px`;
+			toc.style.top = `${Math.round(top)}px`;
+			toc.style.maxHeight = `min(calc(100vh * var(--toc-max-viewport-ratio, 0.5)), calc(100vh - ${Math.round(top)}px - 24px))`;
+		});
+	};
+
 	const scrollTocLinkIntoView = (link, smooth = true) => {
 		const toc = link?.closest?.(".toc-bar");
 		if (!toc) return;
@@ -1124,11 +1149,13 @@
 			if (state.tocScrollFrame) return;
 			state.tocScrollFrame = window.requestAnimationFrame(() => {
 				state.tocScrollFrame = null;
+				syncDesktopTocPosition();
 				syncTocByScroll();
 			});
 		};
 		window.addEventListener("scroll", state.tocScrollHandler, { passive: true });
 		window.addEventListener("resize", state.tocScrollHandler);
+		syncDesktopTocPosition();
 		syncTocByScroll();
 
 		tocs.forEach((toc) => {

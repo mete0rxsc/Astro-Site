@@ -1,10 +1,25 @@
 title: Mete0r's Blog
-description: 记录技术实践、静态博客重构与生活成长的个人空间。
+description: Mete0r的虚拟小世界
 author: Mete0r
 site: https://www.xscnet.cn/
 home: https://xscnet.cn/
-updated: '2026-06-27T00:00:00.000Z'
+updated: '2026-06-30T00:00:00.000Z'
 items:
+  - title: 新的博客框架！全量上线！
+    headline: 新的博客框架！全量上线！
+    caption: 基于Astro的Mete0r专用主题上线啦！
+    link: https://www.xscnet.cn/posts/p4020260630/
+    cover: https://img.xscnet.cn//i/2026/06/30/6a429f7593795.jpg
+    date: '2026-06-30T00:00:00.000Z'
+    updated: '2026-06-30T00:00:00.000Z'
+    excerpt: 本站博客正式完成框架迭代，从 Hexo 迁移至 Astro 自建定制主题！搭载流畅动画、多配色模式、智能搜索等实用功能，适配全设备，联动动态友链、说说等特色页面，性能大幅优化，后续将持续完善站点功能与体验。
+    categories:
+      - 博客
+    tags:
+      - 博客
+      - 更新
+      - Astro
+    readingTime: 2
   - title: 各位好久不见 | 关于后期的规划
     headline: 各位好久不见 | 关于后期的规划
     caption: 回归！

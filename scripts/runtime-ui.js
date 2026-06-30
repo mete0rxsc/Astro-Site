@@ -29,6 +29,7 @@
 	const AUTO_DARK_CONFIG = runtimeConfig.ui?.autoDarkMode || {};
 	const SOCIAL_DOCK_CONFIG = runtimeConfig.ui?.socialDock || {};
 	const POLICY_CONSENT_CONFIG = runtimeConfig.ui?.policyConsent || {};
+	const POST_TRANSITION_CONFIG = runtimeConfig.ui?.postTransition || {};
 	const SAFE_LINKS_CONFIG = runtimeConfig.safeLinks || {};
 	const MERMAID_URL = MARKDOWN_CONFIG.mermaidJs || "https://cdn.jsdmirror.com/npm/mermaid@v9/dist/mermaid.min.js";
 	const FANCYBOX_JS = MARKDOWN_CONFIG.fancyboxJs || "https://cdn.jsdmirror.com/npm/@fancyapps/ui@6.1/dist/fancybox/fancybox.umd.js";
@@ -1367,13 +1368,15 @@
 		const layer = document.createElement("div");
 		layer.className = "post-dust-layer";
 
-		const haze = document.createElement("span");
-		haze.className = "post-dust-haze";
-		haze.style.left = `${rect.left + rect.width / 2}px`;
-		haze.style.top = `${rect.top + rect.height / 2}px`;
-		haze.style.width = `${rect.width * 1.12}px`;
-		haze.style.height = `${rect.height * 1.12}px`;
-		layer.appendChild(haze);
+		if (POST_TRANSITION_CONFIG.hazeEnabled !== false) {
+			const haze = document.createElement("span");
+			haze.className = "post-dust-haze";
+			haze.style.left = `${rect.left + rect.width / 2}px`;
+			haze.style.top = `${rect.top + rect.height / 2}px`;
+			haze.style.width = `${rect.width * 1.12}px`;
+			haze.style.height = `${rect.height * 1.12}px`;
+			layer.appendChild(haze);
+		}
 
 		const fragment = document.createDocumentFragment();
 		const particleCount = Math.min(150, Math.max(72, Math.round((rect.width * rect.height) / 5600)));

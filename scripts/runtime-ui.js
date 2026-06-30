@@ -1363,95 +1363,89 @@
 	const createPostCardShatter = (card) => {
 		const rect = card.getBoundingClientRect();
 		if (rect.width < 40 || rect.height < 40) return null;
-		const columns = Math.floor(3 + Math.random() * 3);
-		const rows = Math.floor(3 + Math.random() * 3);
+		document.querySelectorAll(".post-dust-layer").forEach((layer) => layer.remove());
 		const layer = document.createElement("div");
-		layer.className = "post-shatter-layer";
+		layer.className = "post-dust-layer";
 
-		const mode = Math.floor(Math.random() * 4);
-		const prepareFragment = (fragment, offsetX, offsetY) => {
-			fragment.classList.remove("is-opening");
-			fragment.classList.add("post-shatter-fragment");
-			fragment.style.width = `${rect.width}px`;
-			fragment.style.height = `${rect.height}px`;
-			fragment.style.transform = `translate(${-offsetX}px, ${-offsetY}px)`;
-			fragment.querySelectorAll("img").forEach((image) => {
-				const resolved = image.currentSrc || image.src;
-				if (resolved) image.src = resolved;
-				image.loading = "eager";
-				image.decoding = "sync";
-			});
-		};
+		const haze = document.createElement("span");
+		haze.className = "post-dust-haze";
+		haze.style.left = `${rect.left + rect.width / 2}px`;
+		haze.style.top = `${rect.top + rect.height / 2}px`;
+		haze.style.width = `${rect.width * 1.12}px`;
+		haze.style.height = `${rect.height * 1.12}px`;
+		layer.appendChild(haze);
 
-		for (let row = 0; row < rows; row += 1) {
-			for (let col = 0; col < columns; col += 1) {
-				const piece = document.createElement("span");
-				const pieceWidth = rect.width / columns;
-				const pieceHeight = rect.height / rows;
-				const offsetX = col * pieceWidth;
-				const offsetY = row * pieceHeight;
-				const centerX = col - (columns - 1) / 2;
-				const centerY = row - (rows - 1) / 2;
-				const spread = 42 + Math.random() * 82;
-				const angle = Math.atan2(centerY || Math.random() - 0.5, centerX || Math.random() - 0.5);
-				const swirl = mode === 1 ? (row % 2 ? -1 : 1) * 80 : 0;
-				const lift = mode === 2 ? -120 - Math.random() * 80 : 0;
-				const sink = mode === 3 ? 80 + Math.random() * 90 : 0;
-				const dx = Math.cos(angle) * spread + swirl + (Math.random() - 0.5) * 56;
-				const dy = Math.sin(angle) * spread + lift + sink + (Math.random() - 0.5) * 56;
-				piece.className = "post-shatter-piece";
-				piece.style.left = `${rect.left + offsetX}px`;
-				piece.style.top = `${rect.top + offsetY}px`;
-				piece.style.width = `${pieceWidth + 0.6}px`;
-				piece.style.height = `${pieceHeight + 0.6}px`;
-				piece.style.setProperty("--dx", `${dx}px`);
-				piece.style.setProperty("--dy", `${dy}px`);
-				piece.style.setProperty("--rot", `${(Math.random() - 0.5) * 110}deg`);
-				piece.style.setProperty("--delay", `${(row + col) * 14 + Math.random() * 60}ms`);
-				if (row === 0 && col === 0) piece.classList.add("is-top-left");
-				if (row === 0 && col === columns - 1) piece.classList.add("is-top-right");
-				if (row === rows - 1 && col === 0) piece.classList.add("is-bottom-left");
-				if (row === rows - 1 && col === columns - 1) piece.classList.add("is-bottom-right");
-				const fragment = card.cloneNode(true);
-				prepareFragment(fragment, offsetX, offsetY);
-				piece.appendChild(fragment);
-				layer.appendChild(piece);
-			}
+		const fragment = document.createDocumentFragment();
+		const particleCount = Math.min(150, Math.max(72, Math.round((rect.width * rect.height) / 5600)));
+		for (let index = 0; index < particleCount; index += 1) {
+			const particle = document.createElement("span");
+			const size = 3 + Math.random() * 10;
+			const x = rect.left + Math.random() * rect.width;
+			const y = rect.top + Math.random() * rect.height;
+			const verticalProgress = (y - rect.top) / rect.height;
+			const wave = Math.sin((x - rect.left) / rect.width * Math.PI * 2 + Math.random() * 0.9) * 32;
+			const delay = (1 - verticalProgress) * 140 + Math.random() * 120 + wave;
+			const driftX = (Math.random() - 0.5) * (95 + verticalProgress * 120);
+			const driftY = -38 - Math.random() * 130 - verticalProgress * 70;
+			particle.className = "post-dust-particle";
+			particle.style.left = `${x}px`;
+			particle.style.top = `${y}px`;
+			particle.style.width = `${size}px`;
+			particle.style.height = `${size}px`;
+			particle.style.setProperty("--dx", `${driftX}px`);
+			particle.style.setProperty("--dy", `${driftY}px`);
+			particle.style.setProperty("--scale", `${1.2 + Math.random() * 1.8}`);
+			particle.style.setProperty("--delay", `${Math.max(0, delay)}ms`);
+			particle.style.setProperty("--alpha", `${0.58 + Math.random() * 0.28}`);
+			fragment.appendChild(particle);
 		}
+		layer.appendChild(fragment);
 		document.body.appendChild(layer);
-		window.setTimeout(() => layer.remove(), 900);
+		window.setTimeout(() => layer.remove(), 2200);
 		return layer;
+	};
+
+	const navigateToPost = (url) => {
+		const target = url.pathname + url.search + url.hash;
+		if (window.__mete0rSwup?.navigate) {
+			window.__mete0rSwup.navigate(target);
+			return;
+		}
+		window.location.href = url.href;
 	};
 
 	const bindPostCardTransition = () => {
 		if (state.postTransitionBound) return;
 		state.postTransitionBound = true;
-		document.addEventListener("click", (event) => {
+		window.addEventListener("click", (event) => {
 			if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-			const link = event.target.closest?.(".post-card a[href]");
-			if (!link) return;
-			const url = new URL(link.href, window.location.href);
-			if (url.origin !== window.location.origin || !url.pathname.startsWith("/posts/")) return;
-			const card = link.closest(".post-card");
+			const card = event.target.closest?.(".post-card");
 			if (!card) return;
+			const clickedLink = event.target.closest?.("a[href]");
+			const postLink = clickedLink?.closest(".post-card") === card
+				? clickedLink
+				: card.querySelector(".post-card-cover[href], .post-title-link[href]");
+			if (!postLink) return;
+			const url = new URL(postLink.href, window.location.href);
+			if (url.origin !== window.location.origin || !url.pathname.startsWith("/posts/")) return;
 			event.preventDefault();
 			event.stopImmediatePropagation();
 			if (state.postTransitionActive) return;
+			if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+				navigateToPost(url);
+				return;
+			}
 			state.postTransitionActive = true;
 			window.setTimeout(() => {
 				state.postTransitionActive = false;
 			}, 2000);
 			const layer = createPostCardShatter(card);
-			card.classList.add("is-opening");
+			if (layer) card.classList.add("is-opening");
 			window.setTimeout(() => {
-				layer?.remove();
-				if (window.__mete0rSwup?.navigate) {
-					window.__mete0rSwup.navigate(url.pathname + url.search + url.hash);
-					return;
-				}
-				window.location.href = url.href;
-			}, 420);
-		}, true);
+				state.postTransitionActive = false;
+				navigateToPost(url);
+			}, layer ? 180 : 0);
+		}, { capture: true });
 	};
 
 	const bindFancybox = async () => {
@@ -1668,6 +1662,7 @@
 		initTocBar();
 		initMobileDrawer();
 		initStellarMedia();
+		bindPostCardTransition();
 		bindArticleSafeLinks();
 		bindMomentComments();
 		initArtalk();

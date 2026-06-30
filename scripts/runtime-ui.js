@@ -12,6 +12,7 @@
 	const runtimeConfig = readRuntimeConfig();
 	const FRIENDS_API = runtimeConfig.api?.friends || "https://api.xscnet.cn/data.json";
 	const MOMENTS_API = runtimeConfig.api?.moments || "https://talk.xscnet.cn/api/echo/page";
+	const LATEST_COMMENTS_API = runtimeConfig.api?.latestComments || "https://artalk.xscnet.cn/api/v2/stats/latest_comments?site_name=Mete0rBlog&limit=20";
 	const LOCATION_API = runtimeConfig.api?.location || "https://v1.nsuuu.com/api/ipip?key=d608352ca1ca5e3c";
 	const SLOGAN_API = runtimeConfig.api?.slogan || "https://region.xscnet.cn/api/slogan";
 	const AVATAR = runtimeConfig.assets?.avatar || "https://img.xscnet.cn//i/2026/06/28/6a40e72d6a01e.jpg";
@@ -20,6 +21,7 @@
 	const CACHE_MINUTES = Number(runtimeConfig.cache?.runtimeMinutes || 15);
 	const FRIENDS_CACHE_KEY = runtimeConfig.cache?.friendsKey || "mete0r:friends:v1";
 	const MOMENTS_CACHE_KEY = runtimeConfig.cache?.momentsKey || "mete0r:moments:v1";
+	const LATEST_COMMENTS_CACHE_KEY = runtimeConfig.cache?.latestCommentsKey || "mete0r:latest-comments:v1";
 	const PROJECT_INTERVAL = Number(runtimeConfig.ui?.projectShowcase?.intervalMs || 4200);
 	const MARKDOWN_CONFIG = runtimeConfig.ui?.markdown || {};
 	const SPLASH_CONFIG = runtimeConfig.ui?.splash || {};
@@ -40,6 +42,7 @@
 		fancyboxLoading: null,
 		friendsContainer: null,
 		momentsContainer: null,
+		latestCommentsContainer: null,
 		welcomeNode: null,
 		projectTimer: null,
 		artalkInstance: null,
@@ -47,6 +50,8 @@
 		tocScrollHandler: null,
 		tocScrollFrame: null,
 		planeObserver: null,
+		artalkImageObserver: null,
+		artalkImagePreviewBound: false,
 		postTransitionBound: false,
 		postTransitionActive: false,
 		mobileDrawerBound: false,
@@ -66,6 +71,31 @@
 			'"': "&quot;",
 			"'": "&#039;",
 		})[char]);
+
+	const sanitizeCommentHtml = (html) => {
+		const template = document.createElement("template");
+		template.innerHTML = String(html || "");
+		const allowedTags = new Set(["P", "BR", "A", "STRONG", "B", "EM", "I", "CODE", "PRE", "BLOCKQUOTE", "UL", "OL", "LI", "S"]);
+		template.content.querySelectorAll("*").forEach((node) => {
+			if (!allowedTags.has(node.tagName)) {
+				node.replaceWith(document.createTextNode(node.textContent || ""));
+				return;
+			}
+			[...node.attributes].forEach((attr) => {
+				if (node.tagName === "A" && attr.name === "href") return;
+				node.removeAttribute(attr.name);
+			});
+			if (node.tagName === "A") {
+				const href = node.getAttribute("href") || "";
+				if (!/^https?:\/\//i.test(href) && !href.startsWith("/")) {
+					node.removeAttribute("href");
+				}
+				node.setAttribute("target", "_blank");
+				node.setAttribute("rel", "noopener noreferrer");
+			}
+		});
+		return template.innerHTML;
+	};
 
 	const getPathValue = (source, path) => {
 		if (!path) return undefined;
@@ -447,6 +477,48 @@
 		}
 	};
 
+	const renderLatestComments = async () => {
+		const container = document.querySelector("[data-latest-comments]");
+		if (!container) return;
+		if (state.latestCommentsContainer === container && container.dataset.ready === "true") return;
+		state.latestCommentsContainer = container;
+		container.dataset.ready = "true";
+
+		try {
+			let data = readCache(LATEST_COMMENTS_CACHE_KEY);
+			if (!data) {
+				const response = await fetch(LATEST_COMMENTS_API, { cache: "no-store" });
+				data = await response.json();
+				writeCache(LATEST_COMMENTS_CACHE_KEY, data);
+			}
+			const comments = (Array.isArray(data.data) ? data.data : [])
+				.filter((comment) => comment && comment.is_pending === false && Number(comment.user_id) !== 1 && comment.visible !== false)
+				.sort(() => Math.random() - 0.5)
+				.slice(0, 20);
+
+			if (!comments.length) {
+				container.innerHTML = `<p class="empty-state glass-panel">暂时还没有可以展示的站内评论。</p>`;
+				return;
+			}
+
+			container.innerHTML = comments.map((comment, index) => {
+				const nick = comment.nick || "匿名访客";
+				const content = String(comment.content || "").replace(/\s+/g, " ").trim();
+				const pageUrl = comment.page_url || comment.page_key || "#comments";
+				const lane = index % 6;
+				const duration = 18 + (index % 5) * 2;
+				const delay = index * 1.2;
+				return `
+					<a class="chat-barrage-item" href="${escapeHtml(pageUrl)}" target="_blank" rel="noopener noreferrer" style="--lane:${lane};--duration:${duration}s;--delay:${delay}s;">
+						<span>${escapeHtml(nick)}</span>
+						<b class="chat-barrage-text">${escapeHtml(content)}</b>
+					</a>`;
+			}).join("");
+		} catch (error) {
+			container.innerHTML = `<p class="empty-state glass-panel">最新评论暂时没有获取到。</p>`;
+		}
+	};
+
 	const initProjectShowcase = () => {
 		const showcase = document.querySelector("[data-project-showcase]");
 		if (!showcase || showcase.dataset.ready === "true") return;
@@ -591,6 +663,8 @@
 			initArtalkPlane();
 			container.dataset.ready = "true";
 			setArtalkStatus(container, "ready", config);
+			observeArtalkImages(container);
+			window.setTimeout(() => bindFancybox(), 80);
 		} catch (error) {
 			container.dataset.ready = "error";
 			setArtalkStatus(container, "error", config);
@@ -666,6 +740,19 @@
 		});
 		state.planeObserver.observe(document.body, { childList: true, subtree: true });
 		window.setTimeout(() => state.planeObserver?.disconnect?.(), 10000);
+	};
+
+	const observeArtalkImages = (container) => {
+		if (!container || state.artalkImageObserver) return;
+		let frame = null;
+		state.artalkImageObserver = new MutationObserver(() => {
+			if (frame) return;
+			frame = window.requestAnimationFrame(() => {
+				frame = null;
+				bindFancybox();
+			});
+		});
+		state.artalkImageObserver.observe(container, { childList: true, subtree: true });
 	};
 
 	const initWelcome = async () => {
@@ -911,6 +998,12 @@
 		const drawer = document.querySelector("[data-mobile-drawer]");
 		const toggle = document.querySelector("[data-mobile-menu-toggle]");
 		if (!drawer || !toggle) return;
+		if (open) {
+			syncMobileToc();
+			window.requestAnimationFrame(() => {
+				if (typeof initTocBar === "function") initTocBar();
+			});
+		}
 		drawer.classList.toggle("is-open", open);
 		toggle.classList.toggle("is-open", open);
 		drawer.setAttribute("aria-hidden", open ? "false" : "true");
@@ -1088,20 +1181,56 @@
 		const panel = document.querySelector("[data-mobile-toc-panel]");
 		if (!target || !panel) return;
 
-		const desktopToc = document.querySelector("#swup .toc-bar");
-		if (!desktopToc) {
+		const desktopToc = document.querySelector("#swup .article-content-shell > .toc-bar");
+		const buildFallbackToc = () => {
+			const headings = [...document.querySelectorAll("#swup .article-body :is(h2, h3, h4)")].filter((heading) => heading.id);
+			if (!headings.length) return null;
+			const aside = document.createElement("aside");
+			aside.className = "toc-bar toc-bar-mobile";
+			const title = document.createElement("strong");
+			title.textContent = "目录";
+			const nav = document.createElement("nav");
+			nav.setAttribute("aria-label", "文章目录");
+			headings.forEach((heading) => {
+				const link = document.createElement("a");
+				link.href = `#${heading.id}`;
+				link.textContent = heading.textContent?.trim() || heading.id;
+				link.style.setProperty("--toc-depth", String(Math.max(0, Number(heading.tagName.slice(1)) - 2)));
+				nav.appendChild(link);
+			});
+			const divider = document.createElement("div");
+			divider.className = "toc-divider";
+			divider.setAttribute("aria-hidden", "true");
+			const actions = document.createElement("div");
+			actions.className = "toc-actions";
+			actions.setAttribute("aria-label", "文章操作");
+			actions.innerHTML = `<a href="#top" data-scroll-top>回到顶部</a><a href="#comments">参与讨论</a>`;
+			aside.append(title, nav, divider, actions);
+			return aside;
+		};
+
+		if (!desktopToc && !document.querySelector("#swup .article-body :is(h2, h3, h4)[id]")) {
 			target.replaceChildren();
 			panel.hidden = true;
+			panel.classList.add("is-empty");
 			return;
 		}
 
-		const clone = desktopToc.cloneNode(true);
+		const clone = desktopToc ? desktopToc.cloneNode(true) : buildFallbackToc();
+		if (!clone || !clone.querySelector("nav a")) {
+			target.replaceChildren();
+			panel.hidden = true;
+			panel.classList.add("is-empty");
+			return;
+		}
 		clone.classList.add("toc-bar-mobile");
+		clone.removeAttribute("style");
 		clone.querySelectorAll("[data-ready]").forEach((node) => {
 			node.removeAttribute("data-ready");
 		});
 		target.replaceChildren(clone);
 		panel.hidden = false;
+		panel.classList.remove("is-empty");
 	};
 
 	const initTocBar = () => {
@@ -1327,9 +1456,10 @@
 
 	const bindFancybox = async () => {
 		if (MARKDOWN_CONFIG.fancybox === false) return;
-		const images = [...document.querySelectorAll(".article-body img, .moment-card img, .image-carousel img, .stellar-livephoto img")]
+		const images = [...document.querySelectorAll(".article-body img, .moment-card img, .image-carousel img, .stellar-livephoto img, .comment-section .atk-comment-content img, .comment-section .atk-content img")]
 			.filter((image) => {
 				if (image.closest(".site-header,.social-dock,.footer-container,.site-footer,.brand,.friend-card,.no-lightbox")) return false;
+				if (image.closest(".atk-avatar,.atk-gravatar,.atk-emoticons,.atk-plug-panel,.artalk-plane-decoration,.artalk-loading-mask")) return false;
 				return image.currentSrc || image.src || image.dataset.fullSrc;
 			});
 		if (!images.length) return;
@@ -1338,7 +1468,7 @@
 			if (image.closest("a[data-fancybox]")) return;
 			const anchor = document.createElement("a");
 			anchor.href = image.dataset.fullSrc || image.currentSrc || image.src;
-			anchor.dataset.fancybox = image.closest(".article-body") ? "article-gallery" : "runtime-gallery";
+			anchor.dataset.fancybox = image.closest(".comment-section") ? "artalk-gallery" : image.closest(".article-body") ? "article-gallery" : "runtime-gallery";
 			anchor.dataset.caption = image.alt || "";
 			anchor.className = "fancybox-image-link";
 			image.replaceWith(anchor);
@@ -1349,6 +1479,30 @@
 			dragToClose: true,
 			compact: false,
 		});
+	};
+
+	const bindArtalkImagePreview = () => {
+		if (MARKDOWN_CONFIG.fancybox === false || state.artalkImagePreviewBound) return;
+		state.artalkImagePreviewBound = true;
+		document.addEventListener("click", async (event) => {
+			const image = event.target.closest?.(".comment-section .atk-comment-content img, .comment-section .atk-content img");
+			if (!image) return;
+			if (image.closest(".atk-avatar,.atk-gravatar,.atk-emoticons,.atk-plug-panel,.artalk-plane-decoration,.artalk-loading-mask,.no-lightbox")) return;
+			const src = image.dataset.fullSrc || image.currentSrc || image.src;
+			if (!src) return;
+			event.preventDefault();
+			event.stopPropagation();
+			const Fancybox = await ensureFancybox();
+			Fancybox.show([{
+				src,
+				type: "image",
+				caption: image.alt || "",
+			}], {
+				animated: true,
+				dragToClose: true,
+				compact: false,
+			});
+		}, true);
 	};
 
 	const closeContextMenu = () => {
@@ -1490,10 +1644,13 @@
 
 	const init = () => {
 		state.postTransitionActive = false;
+		state.artalkImageObserver?.disconnect?.();
+		state.artalkImageObserver = null;
 		setMobileDrawerOpen(false);
 		runSplash();
 		renderFriends();
 		renderMoments();
+		renderLatestComments();
 		initCarousels();
 		initProjectShowcase();
 		initWelcome();
@@ -1516,6 +1673,7 @@
 		initArtalk();
 		syncArtalkTheme();
 		bindFancybox();
+		bindArtalkImagePreview();
 		initContextMenu();
 	};
 

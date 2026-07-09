@@ -3,8 +3,25 @@ description: Mete0r的虚拟小世界
 author: Mete0r
 site: https://www.xscnet.cn/
 home: https://xscnet.cn/
-updated: '2026-06-30T00:00:00.000Z'
+updated: '2026-07-10T00:00:00.000Z'
 items:
+  - title: 香港三日游 | 独特的体验
+    headline: 香港三日游 | 独特的体验
+    caption: 为什么南方的热是魔法攻击啊喂！
+    link: https://www.xscnet.cn/posts/p4120260710/
+    cover: https://img.xscnet.cn//i/2026/07/10/6a4ff85bbc024.jpg
+    date: '2026-07-10T00:00:00.000Z'
+    updated: '2026-07-10T00:00:00.000Z'
+    excerpt: >-
+      本篇记录与友人同行的香港三日之旅，从深圳口岸过关，办理本地银行卡与电话卡，逛数码商铺、打卡全球首间麦当劳 Next
+      概念店、品尝特色拉面，夜游维多利亚港，浅体验本地赛马。文中清晰区分港澳与内地博彩相关法律，提醒理性娱乐、远离赌博，记录湿热旅途与往返口岸的真实见闻。
+    categories:
+      - 生活
+    tags:
+      - 生活
+      - 旅行
+      - 香港
+    readingTime: 4
   - title: 新的博客框架！全量上线！
     headline: 新的博客框架！全量上线！
     caption: 基于Astro的Mete0r专用主题上线啦！

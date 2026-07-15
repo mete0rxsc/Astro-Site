@@ -31,6 +31,14 @@
 	const POLICY_CONSENT_CONFIG = runtimeConfig.ui?.policyConsent || {};
 	const POST_TRANSITION_CONFIG = runtimeConfig.ui?.postTransition || {};
 	const SAFE_LINKS_CONFIG = runtimeConfig.safeLinks || {};
+	const STELLAR_CONFIG = runtimeConfig.stellar || {};
+	const MOTION_CONFIG = runtimeConfig.motion || {};
+	const SEARCH_CONFIG = runtimeConfig.search || {};
+	const FRIEND_ACTIVITY_CONFIG = runtimeConfig.friendActivity || {};
+	const FRIEND_APPLY_CONFIG = runtimeConfig.friendApply || {};
+	const MUSIC_CONFIG = runtimeConfig.musicPlayer || {};
+	const KONAMI_SNOW_CONFIG = runtimeConfig.ui?.konamiSnow || {};
+	const RUNTIME_CACHE_CONFIG = runtimeConfig.runtimeCache || {};
 	const MERMAID_URL = MARKDOWN_CONFIG.mermaidJs || "https://cdn.jsdmirror.com/npm/mermaid@v9/dist/mermaid.min.js";
 	const FANCYBOX_JS = MARKDOWN_CONFIG.fancyboxJs || "https://cdn.jsdmirror.com/npm/@fancyapps/ui@6.1/dist/fancybox/fancybox.umd.js";
 	const FANCYBOX_CSS = MARKDOWN_CONFIG.fancyboxCss || "https://cdn.jsdmirror.com/npm/@fancyapps/ui@6.1/dist/fancybox/fancybox.css";
@@ -55,6 +63,8 @@
 		artalkImagePreviewBound: false,
 		postTransitionBound: false,
 		postTransitionActive: false,
+		postTransitionTimers: new Set(),
+		planeTimer: null,
 		mobileDrawerBound: false,
 		contextMenuBound: false,
 		autoDarkToastBound: false,
@@ -62,7 +72,31 @@
 		policyImagesRejected: false,
 		socialDockBound: false,
 		toastTimer: null,
+		friendActivityContainer: null,
+		pageAbortControllers: new Set(),
+		pageDisposers: new Set(),
+		motionObserver: null,
+		stellarDisposer: null,
+		stellarModuleLoading: null,
+		searchIndexPromise: null,
+		headerSearchBound: false,
+		friendsMenuBound: false,
+		musicInitialized: false,
+		musicObserver: null,
+		musicInstance: null,
+		musicTracks: null,
+		musicPlaylistPromise: null,
+		konamiBound: false,
+		konamiBuffer: [],
+		snowLayer: null,
+		snowTimer: null,
+		scriptLoads: new Map(),
 	});
+	state.postTransitionTimers ||= new Set();
+	state.pageAbortControllers ||= new Set();
+	state.pageDisposers ||= new Set();
+	state.scriptLoads ||= new Map();
+	state.konamiBuffer ||= [];
 
 	const escapeHtml = (value) =>
 		String(value ?? "").replace(/[&<>"']/g, (char) => ({
@@ -163,21 +197,28 @@
 		});
 	};
 
-	const loadScript = (src) =>
-		new Promise((resolve, reject) => {
+	const loadScript = (src) => {
+		if (state.scriptLoads.has(src)) return state.scriptLoads.get(src);
+		const promise = new Promise((resolve, reject) => {
 			const existing = document.querySelector(`script[src="${src}"]`);
 			if (existing) {
-				existing.addEventListener("load", resolve, { once: true });
 				resolve();
 				return;
 			}
 			const script = document.createElement("script");
 			script.src = src;
 			script.async = true;
-			script.addEventListener("load", resolve, { once: true });
-			script.addEventListener("error", reject, { once: true });
+			script.addEventListener("load", () => {
+				script.dataset.runtimeLoaded = "true";
+				resolve();
+			}, { once: true });
+			script.addEventListener("error", () => reject(new Error(`Unable to load ${src}`)), { once: true });
 			document.head.appendChild(script);
 		});
+		state.scriptLoads.set(src, promise);
+		promise.catch(() => state.scriptLoads.delete(src));
+		return promise;
+	};
 
 	const loadStyle = (href) => {
 		if (document.querySelector(`link[href="${href}"]`)) return;
@@ -187,10 +228,10 @@
 		document.head.appendChild(link);
 	};
 
-	const readCache = (key) => {
+	const readCache = (key, minutes = CACHE_MINUTES) => {
 		try {
 			const cached = JSON.parse(localStorage.getItem(key) || "null");
-			if (!cached || Date.now() - cached.time > CACHE_MINUTES * 60 * 1000) return null;
+			if (!cached || Date.now() - cached.time > Number(minutes || CACHE_MINUTES) * 60 * 1000) return null;
 			return cached.value;
 		} catch (error) {
 			return null;
@@ -199,9 +240,38 @@
 
 	const writeCache = (key, value) => {
 		try {
-			localStorage.setItem(key, JSON.stringify({ time: Date.now(), value }));
+			const serialized = JSON.stringify({ time: Date.now(), value });
+			const maxChars = Math.max(10000, Number(RUNTIME_CACHE_CONFIG.maxEntryChars || 600000));
+			if (serialized.length <= maxChars) localStorage.setItem(key, serialized);
 		} catch (error) {
 			// localStorage may be full or disabled; runtime fetch can still continue.
+		}
+	};
+
+	const createPageAbortController = () => {
+		const max = Math.max(1, Number(RUNTIME_CACHE_CONFIG.maxActiveRequests || 12));
+		while (state.pageAbortControllers.size >= max) {
+			const oldest = state.pageAbortControllers.values().next().value;
+			oldest?.abort?.();
+			state.pageAbortControllers.delete(oldest);
+		}
+		const controller = new AbortController();
+		state.pageAbortControllers.add(controller);
+		controller.signal.addEventListener("abort", () => state.pageAbortControllers.delete(controller), { once: true });
+		return controller;
+	};
+
+	const addPageDisposer = (disposer) => {
+		if (typeof disposer === "function") state.pageDisposers.add(disposer);
+		return disposer;
+	};
+
+	const fetchPage = async (input, options = {}) => {
+		const controller = createPageAbortController();
+		try {
+			return await fetch(input, { ...options, signal: controller.signal });
+		} finally {
+			state.pageAbortControllers.delete(controller);
 		}
 	};
 
@@ -214,10 +284,41 @@
 
 	const ensureMeting = async () => {
 		if (window.customElements?.get("meting-js")) return;
-		loadStyle("https://cdn.jsdmirror.com/npm/aplayer@1.10.1/dist/APlayer.min.css");
-		state.metingLoading ||= loadScript("https://cdn.jsdmirror.com/npm/aplayer@1.10.1/dist/APlayer.min.js")
-			.then(() => loadScript("https://cdn.jsdmirror.com/npm/meting@2.0.1/dist/Meting.min.js"));
+		await ensureAPlayer();
+		const assets = MUSIC_CONFIG.assets || {};
+		state.metingLoading ||= loadScript(assets.metingJs || "https://cdn.jsdmirror.com/npm/meting@2.0.1/dist/Meting.min.js");
 		await state.metingLoading;
+	};
+
+	const ensureAPlayer = async () => {
+		if (window.APlayer) return window.APlayer;
+		const assets = MUSIC_CONFIG.assets || {};
+		loadStyle(assets.aplayerCss || "https://cdn.jsdmirror.com/npm/aplayer@1.10.1/dist/APlayer.min.css");
+		state.aplayerLoading ||= loadScript(assets.aplayerJs || "https://cdn.jsdmirror.com/npm/aplayer@1.10.1/dist/APlayer.min.js");
+		await state.aplayerLoading;
+		return window.APlayer;
+	};
+
+	const buildMetingApiUrl = (server, type, id) => {
+		const template = String(MUSIC_CONFIG.metingApi || "").trim();
+		if (!template) throw new Error("Meting API is not configured");
+		return template
+			.replaceAll(":server", encodeURIComponent(server))
+			.replaceAll(":type", encodeURIComponent(type))
+			.replaceAll(":id", encodeURIComponent(id))
+			.replaceAll(":r", String(Date.now()));
+	};
+
+	const normalizeMusicUrl = (value) => {
+		const url = String(value || "").trim();
+		return MUSIC_CONFIG.forceHttps !== false ? url.replace(/^http:\/\//i, "https://") : url;
+	};
+
+	const formatMusicTime = (seconds) => {
+		const value = Number.isFinite(Number(seconds)) ? Math.max(0, Number(seconds)) : 0;
+		const minutes = Math.floor(value / 60);
+		const remainder = Math.floor(value % 60);
+		return `${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`;
 	};
 
 	const ensureMermaid = async () => {
@@ -362,7 +463,8 @@
 		try {
 			let data = readCache(FRIENDS_CACHE_KEY);
 			if (!data) {
-				const response = await fetch(FRIENDS_API, { cache: "no-store" });
+				const response = await fetchPage(FRIENDS_API, { cache: "no-store" });
+				if (!response.ok) throw new Error(`Friends ${response.status}`);
 				data = await response.json();
 				writeCache(FRIENDS_CACHE_KEY, data);
 			}
@@ -411,6 +513,237 @@
 		}
 	};
 
+	const getSearchIndex = async () => {
+		if (state.searchIndexPromise) return state.searchIndexPromise;
+		const indexUrl = SEARCH_CONFIG.indexUrl || "/search-index.json";
+		state.searchIndexPromise = fetch(indexUrl, { headers: { Accept: "application/json" } })
+			.then((response) => {
+				if (!response.ok) throw new Error(`Search index ${response.status}`);
+				return response.json();
+			})
+			.then((items) => Array.isArray(items) ? items : [])
+			.catch((error) => {
+				state.searchIndexPromise = null;
+				throw error;
+			});
+		return state.searchIndexPromise;
+	};
+
+	const matchSearchPosts = (posts, query, limit) => {
+		const keyword = String(query || "").trim().toLowerCase();
+		if (!keyword) return posts.slice(0, limit);
+		const terms = keyword.split(/\s+/).filter(Boolean);
+		return posts
+			.map((post, index) => {
+				const title = String(post.title || "").toLowerCase();
+				const text = String(post.searchText || "").toLowerCase();
+				if (!terms.every((term) => text.includes(term) || title.includes(term))) return null;
+				const score = terms.reduce((total, term) => total + (title === term ? 12 : title.startsWith(term) ? 8 : title.includes(term) ? 5 : 1), 0);
+				return { post, score, index };
+			})
+			.filter(Boolean)
+			.sort((a, b) => b.score - a.score || a.index - b.index)
+			.slice(0, limit)
+			.map((entry) => entry.post);
+	};
+
+	const searchResultMarkup = (post, compact = false) => `
+		<a class="search-result${compact ? " compact" : ""}" href="${escapeHtml(post.url || "#")}">
+			<span>${escapeHtml(post.date || "")}</span>
+			<strong>${escapeHtml(post.title || "未命名文章")}</strong>
+			${compact ? "" : `<p>${escapeHtml(post.excerpt || "")}</p>`}
+		</a>`;
+
+	const initFriendsMenu = () => {
+		if (state.friendsMenuBound) return;
+		const menu = document.querySelector("[data-friends-menu]");
+		const trigger = menu?.querySelector("[data-friends-menu-trigger]");
+		if (!menu || !trigger) return;
+		state.friendsMenuBound = true;
+		const setOpen = (open) => {
+			menu.classList.toggle("is-open", open);
+			trigger.setAttribute("aria-expanded", String(open));
+		};
+		trigger.addEventListener("click", (event) => {
+			event.stopPropagation();
+			setOpen(!menu.classList.contains("is-open"));
+		});
+		document.addEventListener("click", (event) => {
+			if (!menu.contains(event.target)) setOpen(false);
+		});
+		document.addEventListener("keydown", (event) => {
+			if (event.key === "Escape") setOpen(false);
+		});
+	};
+
+	const isMobilePerformanceViewport = () => {
+		const breakpoint = Number(runtimeConfig.ui?.mobilePerformance?.maxWidthPx || 900);
+		return window.matchMedia(`(max-width: ${breakpoint}px)`).matches
+			|| window.matchMedia("(hover: none), (pointer: coarse)").matches;
+	};
+
+	const initHeaderSearch = () => {
+		if (state.headerSearchBound || SEARCH_CONFIG.enabled === false) return;
+		const shell = document.querySelector("[data-header-search]");
+		const trigger = shell?.querySelector("[data-header-search-trigger]");
+		const input = shell?.querySelector("[data-header-search-input]");
+		const results = shell?.querySelector("[data-header-search-results]");
+		if (!shell || !trigger || !input || !results) return;
+		state.headerSearchBound = true;
+		const setOpen = (open) => {
+			shell.classList.toggle("is-open", open);
+			trigger.setAttribute("aria-expanded", String(open));
+			if (open) window.setTimeout(() => input.focus(), 30);
+		};
+		const render = async () => {
+			const query = input.value.trim();
+			if (!query) {
+				results.innerHTML = "";
+				return;
+			}
+			results.innerHTML = `<p class="header-search-state">搜索中...</p>`;
+			try {
+				const posts = await getSearchIndex();
+				const matches = matchSearchPosts(posts, query, Number(SEARCH_CONFIG.headerLimit || 3));
+				results.innerHTML = matches.length
+					? matches.map((post) => searchResultMarkup(post, true)).join("")
+					: `<p class="header-search-state">没有找到匹配文章</p>`;
+			} catch {
+				results.innerHTML = `<p class="header-search-state">搜索索引暂时不可用</p>`;
+			}
+		};
+		trigger.addEventListener("click", (event) => {
+			event.stopPropagation();
+			setOpen(!shell.classList.contains("is-open"));
+		});
+		input.addEventListener("input", render);
+		input.addEventListener("keydown", (event) => {
+			if (event.key === "Escape") setOpen(false);
+			if (event.key !== "Enter") return;
+			event.preventDefault();
+			const query = input.value.trim();
+			if (!query) return;
+			const target = `/search/?q=${encodeURIComponent(query)}`;
+			if (window.__mete0rSwup?.navigate) window.__mete0rSwup.navigate(target);
+			else window.location.assign(target);
+			setOpen(false);
+		});
+		document.addEventListener("click", (event) => {
+			if (!shell.contains(event.target)) setOpen(false);
+		});
+	};
+
+	const initSearchPage = async () => {
+		const input = document.querySelector("[data-search-page-input]");
+		const results = document.querySelector("[data-search-page-results]");
+		if (!input || !results || input.dataset.ready === "true") return;
+		input.dataset.ready = "true";
+		const initialQuery = new URLSearchParams(window.location.search).get("q") || "";
+		input.value = initialQuery;
+		let posts = [];
+		const render = () => {
+			const query = input.value.trim();
+			const limit = query ? Number(SEARCH_CONFIG.pageLimit || 50) : Number(SEARCH_CONFIG.initialLimit || 12);
+			const matches = matchSearchPosts(posts, query, limit);
+			results.innerHTML = matches.length
+				? matches.map((post) => searchResultMarkup(post)).join("")
+				: `<p class="empty-state">没有找到匹配的文章。</p>`;
+		};
+		results.innerHTML = `<p class="empty-state">正在载入搜索索引...</p>`;
+		try {
+			posts = await getSearchIndex();
+			render();
+		} catch {
+			results.innerHTML = `<p class="empty-state">搜索索引暂时不可用。</p>`;
+			return;
+		}
+		input.addEventListener("input", render);
+	};
+
+	const renderFriendActivity = async () => {
+		const container = document.querySelector("[data-friend-activity]");
+		if (!container || FRIEND_ACTIVITY_CONFIG.enabled === false) return;
+		if (state.friendActivityContainer === container && container.dataset.ready === "true") return;
+		state.friendActivityContainer = container;
+		container.dataset.ready = "true";
+		const controller = createPageAbortController();
+		try {
+			const cacheMinutes = Number(FRIEND_ACTIVITY_CONFIG.cacheMinutes || CACHE_MINUTES);
+			let data = readCache(FRIENDS_CACHE_KEY, cacheMinutes);
+			if (!data) {
+				const response = await fetch(FRIENDS_API, { cache: "no-store", signal: controller.signal });
+				if (!response.ok) throw new Error(`Friends ${response.status}`);
+				data = await response.json();
+				writeCache(FRIENDS_CACHE_KEY, data);
+			}
+			const items = (Array.isArray(data.content) ? data.content : [])
+				.flatMap((friend) => (Array.isArray(friend.posts) ? friend.posts : []).map((post) => ({
+					friend: friend.title || friend.name || "朋友",
+					avatar: friend.icon || friend.avatar || FRIEND_FALLBACK,
+					friendUrl: friend.url || "#",
+					title: post.title || "未命名文章",
+					url: post.link || post.url || "#",
+					published: post.published || post.date || post.updated || "",
+					time: new Date(post.published || post.date || post.updated || 0).valueOf() || 0,
+				})))
+				.sort((a, b) => b.time - a.time)
+				.slice(0, Math.max(1, Number(FRIEND_ACTIVITY_CONFIG.maxItems || 80)));
+			container.innerHTML = items.length ? items.map((item, index) => `
+				<article class="friend-activity-card glass-panel runtime-card" style="--delay:${Math.min(index, 18) * 35}ms">
+					<a class="friend-activity-avatar" href="${escapeHtml(item.friendUrl)}" target="_blank" rel="noopener noreferrer"><img src="${escapeHtml(item.avatar)}" alt="" loading="lazy" decoding="async"></a>
+					<div><span>${escapeHtml(item.friend)}</span><a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer"><strong>${escapeHtml(item.title)}</strong></a><time>${escapeHtml(item.published || "最近更新")}</time></div>
+				</article>`).join("") : `<p class="empty-state glass-panel">暂时没有可展示的朋友动态。</p>`;
+		} catch (error) {
+			if (error?.name !== "AbortError" && container.isConnected) container.innerHTML = `<p class="empty-state glass-panel">朋友动态暂时无法获取。</p>`;
+		} finally {
+			state.pageAbortControllers.delete(controller);
+		}
+	};
+
+	const initFriendApplyForm = () => {
+		const form = document.querySelector("[data-friend-apply-form]");
+		const status = form?.querySelector("[data-friend-apply-status]");
+		if (!form || !status || form.dataset.ready === "true") return;
+		form.dataset.ready = "true";
+		form.addEventListener("submit", async (event) => {
+			event.preventDefault();
+			if (!form.reportValidity()) return;
+			const button = form.querySelector("button[type='submit']");
+			const data = new FormData(form);
+			const payload = Object.fromEntries(data.entries());
+			["legalCommitment", "crawlCommitment", "originalContent", "independentDomain", "threeYears", "priorInteraction"].forEach((key) => {
+				payload[key] = data.has(key);
+			});
+			payload.turnstileToken = data.get("cf-turnstile-response") || "";
+			status.textContent = "正在提交申请...";
+			status.className = "friend-apply-status is-loading";
+			if (button) button.disabled = true;
+			const controller = createPageAbortController();
+			try {
+				const response = await fetch(form.dataset.endpoint || FRIEND_APPLY_CONFIG.endpoint || "/api/friend-apply", {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(payload),
+					signal: controller.signal,
+				});
+				const result = await response.json().catch(() => ({}));
+				if (!response.ok) throw Object.assign(new Error(result.message || "提交失败"), { result });
+				status.className = "friend-apply-status is-success";
+				status.innerHTML = `${escapeHtml(result.message || "申请已提交。")} ${result.issueUrl ? `<a href="${escapeHtml(result.issueUrl)}" target="_blank" rel="noopener noreferrer">查看 Issue</a>` : ""}`;
+				form.reset();
+				window.turnstile?.reset?.();
+			} catch (error) {
+				if (error?.name !== "AbortError") {
+					status.className = "friend-apply-status is-error";
+					status.textContent = error?.result?.message || "提交失败，请稍后重试。";
+				}
+			} finally {
+				state.pageAbortControllers.delete(controller);
+				if (button) button.disabled = false;
+			}
+		});
+	};
+
 	const renderMoments = async () => {
 		const container = document.querySelector("[data-moments-list]");
 		if (!container) return;
@@ -422,11 +755,12 @@
 			const marked = await ensureMarked();
 			let data = readCache(MOMENTS_CACHE_KEY);
 			if (!data) {
-				const response = await fetch(MOMENTS_API, {
+				const response = await fetchPage(MOMENTS_API, {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({ page: 1, pageSize: 30 }),
 				});
+				if (!response.ok) throw new Error(`Moments ${response.status}`);
 				data = await response.json();
 				writeCache(MOMENTS_CACHE_KEY, data);
 			}
@@ -488,7 +822,8 @@
 		try {
 			let data = readCache(LATEST_COMMENTS_CACHE_KEY);
 			if (!data) {
-				const response = await fetch(LATEST_COMMENTS_API, { cache: "no-store" });
+				const response = await fetchPage(LATEST_COMMENTS_API, { cache: "no-store" });
+				if (!response.ok) throw new Error(`Comments ${response.status}`);
 				data = await response.json();
 				writeCache(LATEST_COMMENTS_CACHE_KEY, data);
 			}
@@ -558,7 +893,7 @@
 			if (config.authHeader && config.authToken) {
 				headers.set(config.authHeader, config.authToken);
 			}
-			const response = await fetch(config.endpoint, {
+			const response = await fetchPage(config.endpoint, {
 				method: "POST",
 				headers,
 				body: formData,
@@ -740,7 +1075,8 @@
 			}
 		});
 		state.planeObserver.observe(document.body, { childList: true, subtree: true });
-		window.setTimeout(() => state.planeObserver?.disconnect?.(), 10000);
+		window.clearTimeout(state.planeTimer);
+		state.planeTimer = window.setTimeout(() => state.planeObserver?.disconnect?.(), 10000);
 	};
 
 	const observeArtalkImages = (container) => {
@@ -766,7 +1102,8 @@
 		locationNode.dataset.ready = "true";
 
 		try {
-			const response = await fetch(LOCATION_API, { cache: "no-store" });
+			const response = await fetchPage(LOCATION_API, { cache: "no-store" });
+			if (!response.ok) throw new Error(`Location ${response.status}`);
 			const data = await response.json();
 			if (data.code !== 200 || !data.data) return;
 
@@ -777,7 +1114,8 @@
 
 			const region = country === "中国" ? `${country}${province || ""}` : country;
 			if (!region) return;
-			const sloganResponse = await fetch(`${SLOGAN_API}?region=${encodeURIComponent(region)}`, { cache: "no-store" });
+			const sloganResponse = await fetchPage(`${SLOGAN_API}?region=${encodeURIComponent(region)}`, { cache: "no-store" });
+			if (!sloganResponse.ok) throw new Error(`Slogan ${sloganResponse.status}`);
 			const sloganData = await sloganResponse.json();
 			sloganNode.textContent = sloganData.slogan || sloganData.content || "欢迎来到我的博客。";
 		} catch (error) {
@@ -1000,6 +1338,8 @@
 		const toggle = document.querySelector("[data-mobile-menu-toggle]");
 		if (!drawer || !toggle) return;
 		if (open) {
+			const scroll = drawer.querySelector(".mobile-drawer-scroll");
+			if (scroll) scroll.scrollTop = 0;
 			syncMobileToc();
 			window.requestAnimationFrame(() => {
 				if (typeof initTocBar === "function") initTocBar();
@@ -1151,14 +1491,21 @@
 	const syncDesktopTocPosition = () => {
 		const article = document.querySelector(".article-main-column") || document.querySelector(".article-body");
 		const header = document.querySelector(".site-header");
-		if (!article) return;
+		if (!article || isMobilePerformanceViewport()) return;
 		const articleRect = article.getBoundingClientRect();
 		const headerRect = header?.getBoundingClientRect();
 		const gap = readCssPx("--toc-gap", 24);
+		const viewportGap = Math.max(12, readCssPx("--toc-right", 32));
 		const headerGap = readCssPx("--toc-header-gap", 12);
 		const top = Math.max(16, (headerRect?.bottom ?? 0) + headerGap);
 		document.querySelectorAll(".article-content-shell > .toc-bar").forEach((toc) => {
-			toc.style.left = `${Math.round(articleRect.right + gap)}px`;
+			const computed = getComputedStyle(toc);
+			const translateX = Number.parseFloat(computed.translate) || 0;
+			const minLeft = viewportGap - Math.min(0, translateX);
+			const maxLeft = window.innerWidth - toc.offsetWidth - viewportGap - Math.max(0, translateX);
+			const preferredLeft = articleRect.right + gap;
+			toc.style.left = `${Math.round(Math.max(minLeft, Math.min(preferredLeft, maxLeft)))}px`;
+			toc.style.right = "auto";
 			toc.style.top = `${Math.round(top)}px`;
 			toc.style.maxHeight = `min(calc(100vh * var(--toc-max-viewport-ratio, 0.5)), calc(100vh - ${Math.round(top)}px - 24px))`;
 		});
@@ -1324,6 +1671,258 @@
 		});
 	};
 
+	const initMusicPlayer = () => {
+		const shell = document.querySelector("[data-music-player]");
+		if (!shell || state.musicInitialized || !String(MUSIC_CONFIG.playlistId || "").trim()) return;
+		state.musicInitialized = true;
+		const trigger = shell.querySelector("[data-music-toggle]");
+		const mount = shell.querySelector("[data-music-mount]");
+		const cover = shell.querySelector("[data-music-cover]");
+		const coverFallback = shell.querySelector("[data-music-cover-fallback]");
+		const title = shell.querySelector("[data-music-title]");
+		const currentTime = shell.querySelector("[data-music-current]");
+		const durationTime = shell.querySelector("[data-music-duration]");
+		const progress = shell.querySelector("[data-music-progress]");
+		const collapsed = MUSIC_CONFIG.collapsed !== false;
+		const failedTracks = new Set();
+		let seeking = false;
+		let activationPending = false;
+		shell.classList.toggle("is-collapsed", collapsed);
+		trigger?.setAttribute("aria-expanded", String(!collapsed));
+		const setCollapsed = (value) => {
+			shell.classList.toggle("is-collapsed", value);
+			trigger?.setAttribute("aria-expanded", String(!value));
+			trigger?.setAttribute("aria-label", value ? "播放当前歌曲" : "暂停当前歌曲");
+		};
+		const setProgress = (ratio, displaySeconds) => {
+			const safeRatio = Math.max(0, Math.min(1, Number(ratio) || 0));
+			shell.style.setProperty("--music-progress", `${safeRatio * 100}%`);
+			if (progress) progress.value = String(Math.round(safeRatio * 1000));
+			if (currentTime && Number.isFinite(displaySeconds)) currentTime.textContent = formatMusicTime(displaySeconds);
+		};
+		const showCover = (url) => {
+			if (!cover || !coverFallback) return;
+			if (!url) {
+				cover.hidden = true;
+				cover.removeAttribute("src");
+				coverFallback.hidden = false;
+				return;
+			}
+			cover.hidden = false;
+			coverFallback.hidden = true;
+			cover.src = url;
+		};
+		cover?.addEventListener("error", () => showCover(""));
+		const syncTrack = (index = 0) => {
+			const tracks = state.musicTracks || [];
+			const track = tracks[Math.max(0, Number(index) || 0)] || tracks[0];
+			if (!track) return;
+			showCover(track.cover);
+			if (title) title.textContent = track.name;
+			trigger?.setAttribute("title", `${track.name} - ${track.artist}`);
+			trigger?.setAttribute("aria-label", state.musicInstance?.audio?.paused === false ? `暂停 ${track.name}` : `播放 ${track.name}`);
+		};
+		const loadPlaylist = async () => {
+			if (Array.isArray(state.musicTracks) && state.musicTracks.length) return state.musicTracks;
+			if (state.musicPlaylistPromise) return state.musicPlaylistPromise;
+			shell.classList.add("is-loading");
+			state.musicPlaylistPromise = (async () => {
+				const controller = new AbortController();
+				const timeout = window.setTimeout(() => controller.abort(), Math.max(1000, Number(MUSIC_CONFIG.requestTimeoutMs || 8000)));
+				let response;
+				try {
+					response = await fetch(buildMetingApiUrl(
+						MUSIC_CONFIG.server || "netease",
+						MUSIC_CONFIG.type || "playlist",
+						String(MUSIC_CONFIG.playlistId),
+					), { signal: controller.signal, headers: { Accept: "application/json" } });
+				} finally {
+					window.clearTimeout(timeout);
+				}
+				if (!response.ok) throw new Error(`Meting API ${response.status}`);
+				const parsed = await response.json();
+				const audio = (Array.isArray(parsed) ? parsed : []).map((track) => ({
+					name: String(track.name || "未命名歌曲"),
+					artist: String(track.artist || "未知歌手"),
+					url: normalizeMusicUrl(track.url),
+					cover: normalizeMusicUrl(track.pic || track.cover),
+					lrc: normalizeMusicUrl(track.lrc),
+				})).filter((track) => track.url);
+				if (!audio.length) throw new Error("Meting API returned an empty playlist");
+				state.musicTracks = audio;
+				syncTrack(0);
+				return audio;
+			})().catch((error) => {
+				state.musicPlaylistPromise = null;
+				state.musicTracks = null;
+				if (title) title.textContent = "歌单解析失败，点击重试";
+				throw error;
+			}).finally(() => shell.classList.remove("is-loading"));
+			return state.musicPlaylistPromise;
+		};
+		const syncPlaybackTime = () => {
+			const player = state.musicInstance;
+			if (!player?.audio || seeking) return;
+			const duration = player.duration || 0;
+			const elapsed = player.audio.currentTime || 0;
+			setProgress(duration ? elapsed / duration : 0, elapsed);
+			if (durationTime) durationTime.textContent = formatMusicTime(duration);
+		};
+		const mountPlayer = async () => {
+			if (state.musicInstance) return state.musicInstance;
+			if (!mount) throw new Error("Music player mount is unavailable");
+			shell.classList.add("is-loading");
+			try {
+				const [APlayer, audio] = await Promise.all([ensureAPlayer(), loadPlaylist()]);
+				mount.replaceChildren();
+				const player = new APlayer({
+					container: mount,
+					audio,
+					autoplay: MUSIC_CONFIG.autoplay === true,
+					volume: Math.max(0, Math.min(1, Number(MUSIC_CONFIG.volume ?? 0.7))),
+					preload: "metadata",
+					loop: MUSIC_CONFIG.autoNext === false ? "none" : "all",
+					order: MUSIC_CONFIG.sequential === false ? "random" : "list",
+					listFolded: true,
+				});
+				state.musicInstance = player;
+				player.on("play", () => {
+					failedTracks.delete(player.list.index);
+					shell.classList.add("is-playing");
+					shell.classList.remove("is-error");
+					setCollapsed(false);
+					syncTrack(player.list.index);
+				});
+				player.on("pause", () => {
+					shell.classList.remove("is-playing");
+					if (MUSIC_CONFIG.collapseOnPause !== false && !(MUSIC_CONFIG.autoNext !== false && player.audio?.ended)) {
+						setCollapsed(true);
+					}
+				});
+				player.on("listswitch", (event) => {
+					setProgress(0, 0);
+					if (durationTime) durationTime.textContent = "00:00";
+					syncTrack(event?.index ?? player.list.index);
+				});
+				player.on("timeupdate", syncPlaybackTime);
+				player.on("loadedmetadata", syncPlaybackTime);
+				player.on("durationchange", syncPlaybackTime);
+				player.on("error", () => {
+					failedTracks.add(player.list.index);
+					if (failedTracks.size < audio.length) {
+						player.skipForward();
+						player.play();
+						return;
+					}
+					shell.classList.add("is-error");
+					setCollapsed(true);
+					if (title) title.textContent = "歌曲暂时无法播放";
+					showToast("当前歌单暂时无法播放，请稍后重试。", 3600);
+				});
+				syncTrack(player.list.index);
+				syncPlaybackTime();
+				return player;
+			} finally {
+				shell.classList.remove("is-loading");
+			}
+		};
+		trigger?.addEventListener("click", async () => {
+			if (activationPending) return;
+			activationPending = true;
+			try {
+				const player = await mountPlayer();
+				if (player.audio?.paused) player.play();
+				else player.pause();
+			} catch {
+				shell.classList.add("is-error");
+				setCollapsed(true);
+				showToast("播放器载入失败，请稍后重试。", 3600);
+			} finally {
+				activationPending = false;
+			}
+		});
+		progress?.addEventListener("pointerdown", () => { seeking = true; });
+		progress?.addEventListener("input", () => {
+			const player = state.musicInstance;
+			const ratio = Math.max(0, Math.min(1, Number(progress.value) / 1000));
+			setProgress(ratio, (player?.duration || 0) * ratio);
+		});
+		progress?.addEventListener("change", () => {
+			const player = state.musicInstance;
+			const ratio = Math.max(0, Math.min(1, Number(progress.value) / 1000));
+			if (player?.duration) player.seek(player.duration * ratio);
+			seeking = false;
+			syncPlaybackTime();
+		});
+		progress?.addEventListener("pointerup", () => { seeking = false; });
+		loadPlaylist().catch(() => {});
+		if (!collapsed || MUSIC_CONFIG.autoplay === true) {
+			mountPlayer().then((player) => {
+				if (MUSIC_CONFIG.autoplay === true) player.play();
+			}).catch(() => {});
+		}
+	};
+
+	const initPageMotion = () => {
+		if (MOTION_CONFIG.enabled === false) return;
+		const root = document.querySelector("#swup");
+		if (!root) return;
+		const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+		const mobile = isMobilePerformanceViewport();
+		if (mobile && MOTION_CONFIG.mobileReduceEffects !== false) {
+			root.querySelectorAll(".motion-reveal").forEach((node) => {
+				node.classList.remove("motion-reveal");
+				node.classList.add("motion-visible");
+			});
+			return;
+		}
+		const max = Math.max(0, Number(mobile ? MOTION_CONFIG.mobileMaxAnimatedItems ?? 8 : MOTION_CONFIG.maxAnimatedItems ?? 18));
+		const stagger = Math.max(0, Number(MOTION_CONFIG.staggerMs ?? 55));
+		const candidates = [...root.querySelectorAll(":scope > *, .post-card, .timeline-year, .taxonomy-card")]
+			.filter((node, index, list) => (
+				list.indexOf(node) === index
+				&& !node.matches(".article-page")
+				&& node.getBoundingClientRect().height <= window.innerHeight * 2.5
+			))
+			.slice(0, max);
+		state.motionObserver?.disconnect?.();
+		if (reduced || !candidates.length) {
+			candidates.forEach((node) => node.classList.add("motion-visible"));
+			return;
+		}
+		state.motionObserver = new IntersectionObserver((entries, observer) => {
+			entries.forEach((entry) => {
+				if (!entry.isIntersecting) return;
+				entry.target.classList.add("motion-visible");
+				observer.unobserve(entry.target);
+			});
+		}, { rootMargin: "0px 0px -7%", threshold: 0 });
+		candidates.forEach((node, index) => {
+			node.classList.add("motion-reveal");
+			node.style.setProperty("--motion-delay", `${Math.min(index, 10) * stagger}ms`);
+			state.motionObserver.observe(node);
+		});
+	};
+
+	const initStellarRuntime = async () => {
+		const root = document.querySelector(".article-body");
+		if (!root || !root.querySelector("[class*='stellar-'], .ds-rating, .ds-vote, .tag-plugin.tabs, .tag-plugin.swiper, .stellar-data-service")) return;
+		try {
+			state.stellarModuleLoading ||= import("/scripts/runtime-stellar.js");
+			const module = await state.stellarModuleLoading;
+			state.stellarDisposer?.();
+			state.stellarDisposer = module.initStellarRuntime(root, STELLAR_CONFIG, {
+				ensureMarked,
+				ensureMeting,
+				escapeHtml,
+				loadScript,
+				loadStyle,
+			});
+		} catch (error) {
+			console.warn("[stellar] runtime initialization failed", error);
+		}
+	};
+
 	const bindMomentComments = () => {
 		document.querySelectorAll("[data-moment-comment]:not([data-ready])").forEach((button) => {
 			button.dataset.ready = "true";
@@ -1361,14 +1960,171 @@
 		});
 	};
 
+	const schedulePostTransition = (callback, delay) => {
+		const timer = window.setTimeout(() => {
+			state.postTransitionTimers.delete(timer);
+			callback();
+		}, delay);
+		state.postTransitionTimers.add(timer);
+		return timer;
+	};
+
+	const clearPostTransitionVisuals = () => {
+		state.postTransitionTimers.forEach((timer) => window.clearTimeout(timer));
+		state.postTransitionTimers.clear();
+		state.postTransitionActive = false;
+		document.querySelectorAll(".post-card.is-opening").forEach((card) => {
+			card.classList.remove("is-opening", "is-mobile-opening");
+		});
+		document.querySelectorAll(".post-dust-layer").forEach((layer) => layer.remove());
+	};
+
+	const removeKonamiSnow = () => {
+		window.clearTimeout(state.snowTimer);
+		state.snowTimer = null;
+		state.snowLayer?.remove?.();
+		state.snowLayer = null;
+	};
+
+	const startKonamiSnow = () => {
+		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+		const duration = Math.max(1000, Number(KONAMI_SNOW_CONFIG.durationMs || 10000));
+		if (!state.snowLayer?.isConnected) {
+			const layer = document.createElement("div");
+			layer.className = "konami-snow-layer";
+			layer.setAttribute("aria-hidden", "true");
+			const mobile = isMobilePerformanceViewport();
+			const count = Math.max(1, Number(mobile
+				? KONAMI_SNOW_CONFIG.mobileFlakeCount ?? 24
+				: KONAMI_SNOW_CONFIG.flakeCount ?? 48));
+			const fragment = document.createDocumentFragment();
+			for (let index = 0; index < count; index += 1) {
+				const flake = document.createElement("span");
+				flake.className = "konami-snowflake";
+				flake.textContent = "❄";
+				flake.style.setProperty("--snow-left", `${Math.random() * 100}%`);
+				flake.style.setProperty("--snow-size", `${8 + Math.random() * 16}px`);
+				flake.style.setProperty("--snow-duration", `${4.2 + Math.random() * 4.8}s`);
+				flake.style.setProperty("--snow-delay", `${-Math.random() * 8}s`);
+				flake.style.setProperty("--snow-drift", `${-9 + Math.random() * 18}vw`);
+				flake.style.setProperty("--snow-opacity", String(0.46 + Math.random() * 0.5));
+				fragment.appendChild(flake);
+			}
+			layer.appendChild(fragment);
+			document.body.appendChild(layer);
+			state.snowLayer = layer;
+		}
+		window.clearTimeout(state.snowTimer);
+		state.snowTimer = window.setTimeout(removeKonamiSnow, duration);
+	};
+
+	const initKonamiSnow = () => {
+		if (state.konamiBound || KONAMI_SNOW_CONFIG.enabled === false) return;
+		state.konamiBound = true;
+		const sequence = (Array.isArray(KONAMI_SNOW_CONFIG.sequence) && KONAMI_SNOW_CONFIG.sequence.length
+			? KONAMI_SNOW_CONFIG.sequence
+			: ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"])
+			.map((key) => String(key).length === 1 ? String(key).toLowerCase() : String(key));
+		document.addEventListener("keydown", (event) => {
+			if (event.repeat || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+			if (event.target?.closest?.("input, textarea, select, [contenteditable='true']")) {
+				state.konamiBuffer = [];
+				return;
+			}
+			const currentPath = window.location.pathname.replace(/\/+$/, "") || "/";
+			if (currentPath !== "/") {
+				state.konamiBuffer = [];
+				return;
+			}
+			const key = event.key.length === 1 ? event.key.toLowerCase() : event.key;
+			state.konamiBuffer.push(key);
+			state.konamiBuffer = state.konamiBuffer.slice(-sequence.length);
+			if (state.konamiBuffer.length === sequence.length && sequence.every((expected, index) => expected === state.konamiBuffer[index])) {
+				state.konamiBuffer = [];
+				startKonamiSnow();
+			}
+		});
+	};
+
+	const cleanupPageRuntime = () => {
+		removeKonamiSnow();
+		state.konamiBuffer = [];
+		state.pageAbortControllers.forEach((controller) => controller.abort());
+		state.pageAbortControllers.clear();
+		state.pageDisposers.forEach((dispose) => {
+			try { dispose(); } catch (error) { /* page cleanup is best effort */ }
+		});
+		state.pageDisposers.clear();
+		state.motionObserver?.disconnect?.();
+		state.motionObserver = null;
+		state.stellarDisposer?.();
+		state.stellarDisposer = null;
+		state.friendsContainer = null;
+		state.friendActivityContainer = null;
+		state.momentsContainer = null;
+		state.latestCommentsContainer = null;
+		state.welcomeNode = null;
+		state.projectTimer && window.clearInterval(state.projectTimer);
+		state.projectTimer = null;
+		window.clearTimeout(state.planeTimer);
+		state.planeTimer = null;
+		state.tocObserver?.disconnect?.();
+		state.tocObserver = null;
+		state.planeObserver?.disconnect?.();
+		state.planeObserver = null;
+		state.artalkImageObserver?.disconnect?.();
+		state.artalkImageObserver = null;
+		if (state.tocScrollHandler) {
+			window.removeEventListener("scroll", state.tocScrollHandler);
+			window.removeEventListener("resize", state.tocScrollHandler);
+			state.tocScrollHandler = null;
+		}
+		if (state.tocScrollFrame) {
+			window.cancelAnimationFrame(state.tocScrollFrame);
+			state.tocScrollFrame = null;
+		}
+		if (state.scrollHandler) {
+			window.removeEventListener("scroll", state.scrollHandler);
+			state.scrollHandler = null;
+		}
+		if (state.backToTopHandler) {
+			window.removeEventListener("scroll", state.backToTopHandler);
+			state.backToTopHandler = null;
+		}
+		state.artalkInstance?.destroy?.();
+		state.artalkInstance = null;
+		clearPostTransitionVisuals();
+	};
+
 	const createPostCardShatter = (card) => {
 		const rect = card.getBoundingClientRect();
 		if (rect.width < 40 || rect.height < 40) return null;
-		document.querySelectorAll(".post-dust-layer").forEach((layer) => layer.remove());
+		clearPostTransitionVisuals();
+		const mobileConfig = POST_TRANSITION_CONFIG.mobile || {};
+		const isMobile = isMobilePerformanceViewport();
+		if (isMobile && mobileConfig.enabled === false) return null;
+		const particleMin = isMobile
+			? Number(mobileConfig.particleMin ?? 24)
+			: Number(POST_TRANSITION_CONFIG.desktopParticleMin ?? 72);
+		const particleMax = isMobile
+			? Number(mobileConfig.particleMax ?? 42)
+			: Number(POST_TRANSITION_CONFIG.desktopParticleMax ?? 150);
+		const navigationDelay = isMobile
+			? Number(mobileConfig.navigationDelayMs ?? 70)
+			: Number(POST_TRANSITION_CONFIG.desktopNavigationDelayMs ?? 180);
+		const cleanupDelay = isMobile
+			? Number(mobileConfig.cleanupDelayMs ?? 900)
+			: Number(POST_TRANSITION_CONFIG.desktopCleanupDelayMs ?? 2200);
+		const animationDuration = isMobile ? Number(mobileConfig.animationDurationMs ?? 260) : 1700;
 		const layer = document.createElement("div");
 		layer.className = "post-dust-layer";
+		layer.classList.toggle("is-mobile-lite", isMobile);
+		layer.style.setProperty("--post-dust-duration", `${animationDuration}ms`);
 
-		if (POST_TRANSITION_CONFIG.hazeEnabled !== false) {
+		const hazeEnabled = isMobile
+			? mobileConfig.hazeEnabled === true
+			: POST_TRANSITION_CONFIG.hazeEnabled !== false;
+		if (hazeEnabled) {
 			const haze = document.createElement("span");
 			haze.className = "post-dust-haze";
 			haze.style.left = `${rect.left + rect.width / 2}px`;
@@ -1379,17 +2135,20 @@
 		}
 
 		const fragment = document.createDocumentFragment();
-		const particleCount = Math.min(150, Math.max(72, Math.round((rect.width * rect.height) / 5600)));
+		const safeParticleMin = Math.max(0, Math.min(particleMin, particleMax));
+		const safeParticleMax = Math.max(safeParticleMin, particleMax);
+		const densityDivisor = isMobile ? 9000 : 5600;
+		const particleCount = Math.min(safeParticleMax, Math.max(safeParticleMin, Math.round((rect.width * rect.height) / densityDivisor)));
 		for (let index = 0; index < particleCount; index += 1) {
 			const particle = document.createElement("span");
-			const size = 3 + Math.random() * 10;
+			const size = 3 + Math.random() * (isMobile ? 6 : 10);
 			const x = rect.left + Math.random() * rect.width;
 			const y = rect.top + Math.random() * rect.height;
 			const verticalProgress = (y - rect.top) / rect.height;
-			const wave = Math.sin((x - rect.left) / rect.width * Math.PI * 2 + Math.random() * 0.9) * 32;
-			const delay = (1 - verticalProgress) * 140 + Math.random() * 120 + wave;
-			const driftX = (Math.random() - 0.5) * (95 + verticalProgress * 120);
-			const driftY = -38 - Math.random() * 130 - verticalProgress * 70;
+			const wave = Math.sin((x - rect.left) / rect.width * Math.PI * 2 + Math.random() * 0.9) * (isMobile ? 6 : 32);
+			const delay = (1 - verticalProgress) * (isMobile ? 24 : 140) + Math.random() * (isMobile ? 28 : 120) + wave;
+			const driftX = (Math.random() - 0.5) * (isMobile ? 72 : 95 + verticalProgress * 120);
+			const driftY = isMobile ? -24 - Math.random() * 58 : -38 - Math.random() * 130 - verticalProgress * 70;
 			particle.className = "post-dust-particle";
 			particle.style.left = `${x}px`;
 			particle.style.top = `${y}px`;
@@ -1404,8 +2163,8 @@
 		}
 		layer.appendChild(fragment);
 		document.body.appendChild(layer);
-		window.setTimeout(() => layer.remove(), 2200);
-		return layer;
+		schedulePostTransition(() => layer.remove(), cleanupDelay);
+		return { layer, isMobile, navigationDelay, cleanupDelay };
 	};
 
 	const navigateToPost = (url) => {
@@ -1431,6 +2190,7 @@
 			if (!postLink) return;
 			const url = new URL(postLink.href, window.location.href);
 			if (url.origin !== window.location.origin || !url.pathname.startsWith("/posts/")) return;
+			if (isMobilePerformanceViewport() && POST_TRANSITION_CONFIG.mobile?.enabled === false) return;
 			event.preventDefault();
 			event.stopImmediatePropagation();
 			if (state.postTransitionActive) return;
@@ -1438,16 +2198,19 @@
 				navigateToPost(url);
 				return;
 			}
+			const transition = createPostCardShatter(card);
 			state.postTransitionActive = true;
-			window.setTimeout(() => {
-				state.postTransitionActive = false;
-			}, 2000);
-			const layer = createPostCardShatter(card);
-			if (layer) card.classList.add("is-opening");
-			window.setTimeout(() => {
+			if (transition) {
+				card.classList.add("is-opening");
+				card.classList.toggle("is-mobile-opening", transition.isMobile);
+			}
+			schedulePostTransition(() => {
 				state.postTransitionActive = false;
 				navigateToPost(url);
-			}, layer ? 180 : 0);
+			}, transition?.navigationDelay ?? 0);
+			schedulePostTransition(() => {
+				state.postTransitionActive = false;
+			}, transition?.cleanupDelay ?? 2000);
 		}, { capture: true });
 	};
 
@@ -1600,7 +2363,8 @@
 
 		const currentPath = window.location.pathname.replace(/\/+$/, "") || "/";
 		const homeOnly = SPLASH_CONFIG.homeOnly !== false;
-		if (SPLASH_CONFIG.enabled === false || (homeOnly && currentPath !== "/")) {
+		const disableOnMobile = MOTION_CONFIG.mobileDisableSplash !== false && isMobilePerformanceViewport();
+		if (SPLASH_CONFIG.enabled === false || disableOnMobile || (homeOnly && currentPath !== "/")) {
 			splash.remove();
 			document.documentElement.classList.remove("splash-active");
 			return;
@@ -1640,12 +2404,14 @@
 	};
 
 	const init = () => {
-		state.postTransitionActive = false;
-		state.artalkImageObserver?.disconnect?.();
-		state.artalkImageObserver = null;
+		cleanupPageRuntime();
 		setMobileDrawerOpen(false);
+		initFriendsMenu();
+		initHeaderSearch();
+		initMusicPlayer();
 		runSplash();
 		renderFriends();
+		renderFriendActivity();
 		renderMoments();
 		renderLatestComments();
 		initCarousels();
@@ -1658,6 +2424,7 @@
 		initPolicyConsentToast();
 		applyPolicyImageRejection();
 		initSocialDockEasterEgg();
+		initKonamiSnow();
 		initCodeBlocks();
 		initStellarImages();
 		initMermaid();
@@ -1665,6 +2432,10 @@
 		initTocBar();
 		initMobileDrawer();
 		initStellarMedia();
+		initStellarRuntime();
+		initSearchPage();
+		initFriendApplyForm();
+		initPageMotion();
 		bindPostCardTransition();
 		bindArticleSafeLinks();
 		bindMomentComments();
@@ -1677,5 +2448,6 @@
 
 	document.addEventListener("DOMContentLoaded", init);
 	window.addEventListener("astroblog:page-load", init);
+	window.addEventListener("astroblog:cleanup-page", cleanupPageRuntime);
 	window.addEventListener("astroblog:theme-change", syncArtalkTheme);
 })();

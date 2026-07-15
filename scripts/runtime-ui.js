@@ -908,18 +908,46 @@
 				status.className = "friend-apply-status is-success";
 				status.innerHTML = `${escapeHtml(result.message || "申请已提交。")} ${result.issueUrl ? `<a href="${escapeHtml(result.issueUrl)}" target="_blank" rel="noopener noreferrer">查看 Issue</a>` : ""}`;
 				form.reset();
-				window.turnstile?.reset?.();
+				const widget = form.querySelector(".cf-turnstile[data-turnstile-widget-id]");
+				window.turnstile?.reset?.(widget?.dataset.turnstileWidgetId);
 				renderFriendPending({ force: true });
 			} catch (error) {
 				if (error?.name !== "AbortError") {
 					status.className = "friend-apply-status is-error";
-					status.textContent = error?.result?.message || "提交失败，请稍后重试。";
+					const baseMessage = error?.result?.message || "提交失败，请稍后重试。";
+					const turnstileHelp = "如果没有cloudflare验证卡片，请刷新页面";
+					status.textContent = error?.result?.code === "TURNSTILE_FAILED" && !baseMessage.includes(turnstileHelp)
+						? `${baseMessage}${baseMessage.endsWith("。") ? "" : "。"}${turnstileHelp}`
+						: baseMessage;
 				}
 			} finally {
 				state.pageAbortControllers.delete(controller);
 				if (button) button.disabled = false;
 			}
 		});
+	};
+
+	const initFriendApplyTurnstile = async () => {
+		const widget = document.querySelector("[data-friend-apply-form] .cf-turnstile[data-sitekey]");
+		if (!widget || FRIEND_APPLY_CONFIG.turnstile?.enabled === false || widget.dataset.turnstileReady === "true") return;
+		widget.dataset.turnstileReady = "true";
+		const scriptUrl = FRIEND_APPLY_CONFIG.turnstile?.scriptUrl
+			|| "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+		try {
+			await loadScript(scriptUrl);
+			if (!widget.isConnected || typeof window.turnstile?.render !== "function") return;
+			const widgetId = window.turnstile.render(widget, {
+				sitekey: widget.dataset.sitekey,
+				theme: FRIEND_APPLY_CONFIG.turnstile?.theme || "auto",
+			});
+			widget.dataset.turnstileWidgetId = String(widgetId);
+			addPageDisposer(() => {
+				try { window.turnstile?.remove?.(widgetId); } catch { /* Widget may already be removed with the page. */ }
+			});
+		} catch (error) {
+			widget.dataset.turnstileReady = "error";
+			console.warn("[friend-apply] Turnstile failed to load", error);
+		}
 	};
 
 	const renderMoments = async () => {
@@ -2773,6 +2801,7 @@
 		initStellarMedia();
 		initStellarRuntime();
 		initSearchPage();
+		initFriendApplyTurnstile();
 		initFriendApplyForm();
 		initPageMotion();
 		bindPostCardTransition();

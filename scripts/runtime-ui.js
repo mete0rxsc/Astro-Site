@@ -41,7 +41,7 @@
 	const HEADING_LINES_CONFIG = MARKDOWN_CONFIG.headingLines || {};
 	const KONAMI_SNOW_CONFIG = runtimeConfig.ui?.konamiSnow || {};
 	const RUNTIME_CACHE_CONFIG = runtimeConfig.runtimeCache || {};
-	const MERMAID_URL = MARKDOWN_CONFIG.mermaidJs || "https://cdn.jsdmirror.com/npm/mermaid@v9/dist/mermaid.min.js";
+	const MERMAID_URL = MARKDOWN_CONFIG.mermaidJs || "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js";
 	const FANCYBOX_JS = MARKDOWN_CONFIG.fancyboxJs || "https://cdn.jsdmirror.com/npm/@fancyapps/ui@6.1/dist/fancybox/fancybox.umd.js";
 	const FANCYBOX_CSS = MARKDOWN_CONFIG.fancyboxCss || "https://cdn.jsdmirror.com/npm/@fancyapps/ui@6.1/dist/fancybox/fancybox.css";
 
@@ -363,9 +363,16 @@
 
 	const ensureMermaid = async () => {
 		if (window.mermaid) return window.mermaid;
-		state.mermaidLoading ||= loadScript(MERMAID_URL);
-		await state.mermaidLoading;
-		return window.mermaid;
+		state.mermaidLoading ||= loadScript(MERMAID_URL)
+			.then(() => {
+				if (!window.mermaid) throw new Error("Mermaid 脚本已加载，但没有提供全局实例");
+				return window.mermaid;
+			})
+			.catch((error) => {
+				state.mermaidLoading = null;
+				throw error;
+			});
+		return state.mermaidLoading;
 	};
 
 	const ensureFancybox = async () => {
@@ -1695,27 +1702,48 @@
 
 	const initMermaid = async () => {
 		if (MARKDOWN_CONFIG.mermaid === false) return;
-		const blocks = [...document.querySelectorAll(".article-body pre > code.language-mermaid, .article-body pre > code[class*='language-mermaid']")];
+		const blocks = [...document.querySelectorAll(".article-body pre[data-language='mermaid'] > code, .article-body pre > code.language-mermaid, .article-body pre > code[class*='language-mermaid']")]
+			.filter((code) => code.dataset.mermaidPending !== "true");
 		if (!blocks.length) return;
-		const mermaid = await ensureMermaid();
+		blocks.forEach((code) => { code.dataset.mermaidPending = "true"; });
+		let mermaid;
+		try {
+			mermaid = await ensureMermaid();
+		} catch (error) {
+			blocks.forEach((code) => { delete code.dataset.mermaidPending; });
+			console.warn("[Mermaid] 渲染脚本加载失败，已保留原代码块。", error);
+			return;
+		}
 		mermaid.initialize({
 			startOnLoad: false,
-			theme: document.documentElement.dataset.theme === "dark" ? "dark" : "default",
-			securityLevel: "loose",
+			theme: document.documentElement.dataset.theme === "dark"
+				? (MARKDOWN_CONFIG.mermaidThemeDark || "dark")
+				: (MARKDOWN_CONFIG.mermaidThemeLight || "default"),
+			securityLevel: MARKDOWN_CONFIG.mermaidSecurityLevel || "loose",
 		});
-		const nodes = blocks.map((code, index) => {
+		for (const [index, code] of blocks.entries()) {
 			const pre = code.closest("pre");
+			if (!pre?.isConnected) continue;
 			const wrapper = document.createElement("div");
 			wrapper.className = "mermaid";
 			wrapper.id = "mermaid-" + Date.now() + "-" + index;
+			wrapper.dataset.mermaidState = "loading";
 			wrapper.textContent = code.textContent || "";
 			pre.replaceWith(wrapper);
-			return wrapper;
-		});
-		if (typeof mermaid.run === "function") {
-			await mermaid.run({ nodes });
-		} else if (typeof mermaid.init === "function") {
-			mermaid.init(undefined, nodes);
+			try {
+				if (typeof mermaid.run === "function") {
+					await mermaid.run({ nodes: [wrapper] });
+				} else if (typeof mermaid.init === "function") {
+					await Promise.resolve(mermaid.init(undefined, [wrapper]));
+				} else {
+					throw new Error("当前 Mermaid 版本不支持 run 或 init");
+				}
+				wrapper.dataset.mermaidState = "ready";
+			} catch (error) {
+				wrapper.replaceWith(pre);
+				delete code.dataset.mermaidPending;
+				console.warn(`[Mermaid] 第 ${index + 1} 个图表渲染失败，已恢复原代码块。`, error);
+			}
 		}
 	};
 

@@ -3,8 +3,25 @@ description: Mete0r的虚拟小世界
 author: Mete0r
 site: https://www.xscnet.cn/
 home: https://xscnet.cn/
-updated: '2026-07-10T00:00:00.000Z'
+updated: '2026-07-16T00:00:00.000Z'
 items:
+  - title: 更新简报01
+    headline: 更新简报01
+    link: https://www.xscnet.cn/posts/p4220260716/
+    cover: https://img.xscnet.cn//i/2026/07/16/6a57c5d7a2f73.jpg
+    date: '2026-07-16T00:00:00.000Z'
+    updated: '2026-07-16T00:00:00.000Z'
+    excerpt: >-
+      博客正式迈入B测v1阶段，本次更新内容丰富且改动幅度较大。完成无Github账号友链自助申请功能开发，优化Artalk评论区样式与适配效果，升级音乐播放器交互体验，同时完成原Hexo
+      Stellar主题各类标签的迁移适配。文末附主页神秘彩蛋，欢迎大家探索体验。
+    categories:
+      - 博客
+    tags:
+      - 博客
+      - Astro
+      - 主题开发
+      - 更新
+    readingTime: 4
   - title: 香港三日游 | 独特的体验
     headline: 香港三日游 | 独特的体验
     caption: 为什么南方的热是魔法攻击啊喂！

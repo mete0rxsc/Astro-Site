@@ -62,6 +62,8 @@
 		tocScrollFrame: null,
 		planeObserver: null,
 		artalkImageObserver: null,
+		artalkThemeObserver: null,
+		artalkThemeFrame: null,
 		artalkImagePreviewBound: false,
 		postTransitionBound: false,
 		postTransitionActive: false,
@@ -1167,6 +1169,37 @@
 			observer.observe(container, { childList: true, subtree: true });
 		});
 
+	const initArtalkAppearance = (container, appearance = {}) => {
+		const wrapper = container?.closest?.("[data-artalk-wrapper]");
+		if (!wrapper || appearance.enabled === false) return;
+		const configuredDepth = Number(appearance.maxReplyIndentLevel ?? 3);
+		const maxDepth = Number.isFinite(configuredDepth) ? Math.max(0, Math.min(8, configuredDepth)) : 3;
+		const apply = () => {
+			state.artalkThemeFrame = null;
+			if (!container.isConnected) return;
+			container.querySelectorAll(".atk-comment-wrap").forEach((comment) => {
+				let depth = 0;
+				let parent = comment.parentElement;
+				while (parent && parent !== container) {
+					if (parent.classList?.contains("atk-comment-children")) depth += 1;
+					parent = parent.parentElement;
+				}
+				comment.dataset.artalkDepth = String(depth);
+				comment.style.setProperty("--artalk-thread-indent-active", depth > 0 && depth <= maxDepth ? "var(--artalk-reply-indent)" : "0px");
+				if (!comment.dataset.artalkThemed) comment.dataset.artalkThemed = "true";
+			});
+			wrapper.dataset.artalkAppearanceReady = "true";
+		};
+		const schedule = () => {
+			if (state.artalkThemeFrame) return;
+			state.artalkThemeFrame = window.requestAnimationFrame(apply);
+		};
+		state.artalkThemeObserver?.disconnect?.();
+		state.artalkThemeObserver = new MutationObserver(schedule);
+		state.artalkThemeObserver.observe(container, { childList: true, subtree: true });
+		apply();
+	};
+
 	const initArtalk = async () => {
 		const container = document.querySelector("[data-artalk]");
 		const configNode = document.querySelector("#artalk-config");
@@ -1202,6 +1235,7 @@
 			});
 			await waitForArtalkDom(container, safeTimeoutMs);
 			syncArtalkTheme();
+			initArtalkAppearance(container, config.appearance);
 			initArtalkPlane();
 			container.dataset.ready = "true";
 			setArtalkStatus(container, "ready", config);
@@ -1244,18 +1278,24 @@
 			const decoration = document.createElement("div");
 			decoration.dataset.artalkPlane = "true";
 			decoration.className = "artalk-plane-decoration";
-			decoration.style.right = config.right || "12px";
-			decoration.style.top = config.top || "12px";
+			const mobile = isMobilePerformanceViewport();
+			if (mobile && config.showOnMobile === false) return true;
+			const activeWidth = mobile ? config.mobileWidth || config.width : config.width;
+			const activeHeight = mobile ? config.mobileHeight || config.height : config.height;
+			const activeRight = mobile ? config.mobileRight || config.right : config.right;
+			const activeTop = mobile ? config.mobileTop || config.top : config.top;
+			decoration.style.right = activeRight || "12px";
+			decoration.style.top = activeTop || "12px";
 
 			const image = document.createElement("img");
 			image.src = config.imageUrl;
 			image.alt = "";
 			image.setAttribute("aria-hidden", "true");
-			image.style.width = config.width || "100px";
-			image.style.height = config.height || "100px";
+			image.style.width = activeWidth || "100px";
+			image.style.height = activeHeight || "100px";
 			if (config.maxWidth) image.style.maxWidth = config.maxWidth;
 			if (config.maxHeight) image.style.maxHeight = config.maxHeight;
-			image.style.opacity = String(config.opacity ?? 0.7);
+			image.style.opacity = String(mobile ? config.mobileOpacity ?? config.opacity ?? 0.28 : config.opacity ?? 0.38);
 			image.style.borderRadius = config.borderRadius || "6px";
 			image.addEventListener("error", () => {
 				decoration.hidden = true;
@@ -1264,8 +1304,8 @@
 			decoration.appendChild(image);
 			wrap.appendChild(decoration);
 
-			const width = Number.parseInt(config.width || config.maxWidth || "100", 10);
-			const right = Number.parseInt(config.right || "12", 10);
+			const width = Number.parseInt(activeWidth || config.maxWidth || "100", 10);
+			const right = Number.parseInt(activeRight || "12", 10);
 			const currentPadding = Number.parseInt(getComputedStyle(textarea).paddingRight || "0", 10);
 			if (Number.isFinite(width) && currentPadding < width + right) {
 				textarea.style.paddingRight = `${width + right}px`;
@@ -2379,6 +2419,12 @@
 		state.planeObserver = null;
 		state.artalkImageObserver?.disconnect?.();
 		state.artalkImageObserver = null;
+		state.artalkThemeObserver?.disconnect?.();
+		state.artalkThemeObserver = null;
+		if (state.artalkThemeFrame) {
+			window.cancelAnimationFrame(state.artalkThemeFrame);
+			state.artalkThemeFrame = null;
+		}
 		if (state.tocScrollHandler) {
 			window.removeEventListener("scroll", state.tocScrollHandler);
 			window.removeEventListener("resize", state.tocScrollHandler);
@@ -2525,6 +2571,7 @@
 			.filter((image) => {
 				if (image.closest(".site-header,.social-dock,.footer-container,.site-footer,.brand,.friend-card,.no-lightbox")) return false;
 				if (image.closest(".atk-avatar,.atk-gravatar,.atk-emoticons,.atk-plug-panel,.artalk-plane-decoration,.artalk-loading-mask")) return false;
+				if (image.closest('[data-artalk-media-preview="disabled"]')) return false;
 				return image.currentSrc || image.src || image.dataset.fullSrc;
 			});
 		if (!images.length) return;
@@ -2536,6 +2583,7 @@
 			anchor.dataset.fancybox = image.closest(".comment-section") ? "artalk-gallery" : image.closest(".article-body") ? "article-gallery" : "runtime-gallery";
 			anchor.dataset.caption = image.alt || "";
 			anchor.className = "fancybox-image-link";
+			if (image.hasAttribute("atk-emoticon")) anchor.dataset.artalkMedia = "emoticon";
 			image.replaceWith(anchor);
 			anchor.appendChild(image);
 		});
@@ -2547,12 +2595,13 @@
 	};
 
 	const bindArtalkImagePreview = () => {
-		if (MARKDOWN_CONFIG.fancybox === false || state.artalkImagePreviewBound) return;
+		if (state.artalkImagePreviewBound) return;
 		state.artalkImagePreviewBound = true;
 		document.addEventListener("click", async (event) => {
 			const image = event.target.closest?.(".comment-section .atk-comment-content img, .comment-section .atk-content img");
 			if (!image) return;
 			if (image.closest(".atk-avatar,.atk-gravatar,.atk-emoticons,.atk-plug-panel,.artalk-plane-decoration,.artalk-loading-mask,.no-lightbox")) return;
+			if (image.closest('[data-artalk-media-preview="disabled"]')) return;
 			const src = image.dataset.fullSrc || image.currentSrc || image.src;
 			if (!src) return;
 			event.preventDefault();

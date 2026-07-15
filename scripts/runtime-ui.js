@@ -33,10 +33,12 @@
 	const SAFE_LINKS_CONFIG = runtimeConfig.safeLinks || {};
 	const STELLAR_CONFIG = runtimeConfig.stellar || {};
 	const MOTION_CONFIG = runtimeConfig.motion || {};
+	const MINIMAL_MOTION_CONFIG = MOTION_CONFIG.manualMinimal || {};
 	const SEARCH_CONFIG = runtimeConfig.search || {};
 	const FRIEND_ACTIVITY_CONFIG = runtimeConfig.friendActivity || {};
 	const FRIEND_APPLY_CONFIG = runtimeConfig.friendApply || {};
 	const MUSIC_CONFIG = runtimeConfig.musicPlayer || {};
+	const HEADING_LINES_CONFIG = MARKDOWN_CONFIG.headingLines || {};
 	const KONAMI_SNOW_CONFIG = runtimeConfig.ui?.konamiSnow || {};
 	const RUNTIME_CACHE_CONFIG = runtimeConfig.runtimeCache || {};
 	const MERMAID_URL = MARKDOWN_CONFIG.mermaidJs || "https://cdn.jsdmirror.com/npm/mermaid@v9/dist/mermaid.min.js";
@@ -67,12 +69,16 @@
 		planeTimer: null,
 		mobileDrawerBound: false,
 		contextMenuBound: false,
+		contextMenuTipShown: false,
 		autoDarkToastBound: false,
 		policyConsentBound: false,
 		policyImagesRejected: false,
 		socialDockBound: false,
 		toastTimer: null,
 		friendActivityContainer: null,
+		friendPendingContainer: null,
+		friendPendingCache: null,
+		friendPendingCacheAt: 0,
 		pageAbortControllers: new Set(),
 		pageDisposers: new Set(),
 		motionObserver: null,
@@ -86,6 +92,9 @@
 		musicInstance: null,
 		musicTracks: null,
 		musicPlaylistPromise: null,
+		musicVolume: null,
+		musicVolumeTipShown: false,
+		musicLocalTipTimer: null,
 		konamiBound: false,
 		konamiBuffer: [],
 		snowLayer: null,
@@ -97,6 +106,8 @@
 	state.pageDisposers ||= new Set();
 	state.scriptLoads ||= new Map();
 	state.konamiBuffer ||= [];
+	state.musicVolumeTipShown ??= false;
+	state.contextMenuTipShown ??= false;
 
 	const escapeHtml = (value) =>
 		String(value ?? "").replace(/[&<>"']/g, (char) => ({
@@ -319,6 +330,33 @@
 		const minutes = Math.floor(value / 60);
 		const remainder = Math.floor(value % 60);
 		return `${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`;
+	};
+
+	const clampMusicVolume = (value) => Math.max(0, Math.min(1, Number(value) || 0));
+
+	const getMusicVolume = () => {
+		if (Number.isFinite(state.musicVolume)) return clampMusicVolume(state.musicVolume);
+		const fallback = clampMusicVolume(MUSIC_CONFIG.volume ?? 0.7);
+		try {
+			const stored = localStorage.getItem(MUSIC_CONFIG.volumeStorageKey || "mete0r:music-volume:v1");
+			const saved = stored === null ? Number.NaN : Number(stored);
+			state.musicVolume = Number.isFinite(saved) ? clampMusicVolume(saved) : fallback;
+		} catch {
+			state.musicVolume = fallback;
+		}
+		return state.musicVolume;
+	};
+
+	const setMusicVolume = (value, { persist = true } = {}) => {
+		const volume = clampMusicVolume(value);
+		state.musicVolume = volume;
+		const player = state.musicInstance;
+		if (typeof player?.volume === "function") player.volume(volume, true, true);
+		else if (player?.audio) player.audio.volume = volume;
+		if (persist) {
+			try { localStorage.setItem(MUSIC_CONFIG.volumeStorageKey || "mete0r:music-volume:v1", String(volume)); } catch { /* storage is optional */ }
+		}
+		return volume;
 	};
 
 	const ensureMermaid = async () => {
@@ -564,6 +602,12 @@
 			menu.classList.toggle("is-open", open);
 			trigger.setAttribute("aria-expanded", String(open));
 		};
+		const finishSelection = (link) => {
+			setOpen(false);
+			link?.blur?.();
+			trigger.blur();
+			menu.classList.add("is-suppressing-hover");
+		};
 		trigger.addEventListener("click", (event) => {
 			event.stopPropagation();
 			setOpen(!menu.classList.contains("is-open"));
@@ -574,6 +618,11 @@
 		document.addEventListener("keydown", (event) => {
 			if (event.key === "Escape") setOpen(false);
 		});
+		menu.querySelectorAll("[data-friends-menu-dropdown] a").forEach((link) => {
+			link.addEventListener("click", () => finishSelection(link));
+		});
+		menu.addEventListener("pointerleave", () => menu.classList.remove("is-suppressing-hover"));
+		window.addEventListener("astroblog:cleanup-page", () => setOpen(false));
 	};
 
 	const isMobilePerformanceViewport = () => {
@@ -581,6 +630,8 @@
 		return window.matchMedia(`(max-width: ${breakpoint}px)`).matches
 			|| window.matchMedia("(hover: none), (pointer: coarse)").matches;
 	};
+
+	const isMinimalMotionEnabled = () => document.documentElement.dataset.minimalMotion === "enabled";
 
 	const initHeaderSearch = () => {
 		if (state.headerSearchBound || SEARCH_CONFIG.enabled === false) return;
@@ -700,6 +751,132 @@
 		}
 	};
 
+	const initFriendPendingDrawer = () => {
+		const layout = document.querySelector("[data-friend-apply-layout]");
+		const panel = document.querySelector("[data-friend-pending]");
+		if (!layout || !panel || layout.dataset.drawerReady === "true") return;
+		layout.dataset.drawerReady = "true";
+		const breakpoint = Math.max(320, Number(layout.dataset.drawerBreakpoint || FRIEND_APPLY_CONFIG.pending?.mobileBreakpointPx || 900));
+		const readDesktopPosition = () => {
+			const layoutRect = layout.getBoundingClientRect();
+			const headerRect = document.querySelector(".site-header")?.getBoundingClientRect();
+			const panelWidth = Math.max(180, Number(FRIEND_APPLY_CONFIG.pending?.panelWidthPx || 256));
+			const viewportGap = Math.max(12, Number(FRIEND_APPLY_CONFIG.pending?.desktopRightPx || 24));
+			const panelGap = Math.max(0, Number(FRIEND_APPLY_CONFIG.pending?.panelGapPx || 24));
+			const alignToHeader = FRIEND_APPLY_CONFIG.pending?.alignFormToHeaderRight !== false;
+			const targetRight = Math.round(alignToHeader && headerRect ? headerRect.right : layoutRect.right);
+			const layoutWidth = Math.max(0, targetRight - layoutRect.left);
+			const preferredLeft = targetRight + panelGap;
+			const maxLeft = Math.max(viewportGap, window.innerWidth - panelWidth - viewportGap);
+			const left = FRIEND_APPLY_CONFIG.pending?.desktopClampToViewport === false
+				? preferredLeft
+				: Math.min(preferredLeft, maxLeft);
+			return {
+				layoutWidth,
+				left,
+			};
+		};
+		const syncDesktopPosition = (position = readDesktopPosition()) => {
+			const header = document.querySelector(".site-header");
+			const headerGap = Math.max(0, Number(FRIEND_APPLY_CONFIG.pending?.headerGapPx || 12));
+			const offsetY = Number(FRIEND_APPLY_CONFIG.pending?.desktopOffsetYPx ?? 0);
+			const ratio = Math.max(0.3, Math.min(0.9, Number(FRIEND_APPLY_CONFIG.pending?.maxViewportRatio || 0.66)));
+			const top = Math.max(16, Math.round((header?.getBoundingClientRect().bottom || 0) + headerGap + (Number.isFinite(offsetY) ? offsetY : 0)));
+			panel.style.top = `${top}px`;
+			panel.style.left = `${position.left}px`;
+			panel.style.right = "auto";
+			panel.style.maxHeight = `min(calc(100vh * ${ratio}), calc(100vh - ${top}px - 24px))`;
+		};
+		const syncMode = () => {
+			const desktopPosition = readDesktopPosition();
+			const desktop = window.innerWidth > breakpoint;
+			if (desktop && FRIEND_APPLY_CONFIG.pending?.alignFormToHeaderRight !== false) {
+				layout.style.width = `${desktopPosition.layoutWidth}px`;
+			} else {
+				layout.style.removeProperty("width");
+			}
+			panel.classList.toggle("is-mobile-stacked", !desktop && FRIEND_APPLY_CONFIG.pending?.mobileStacked !== false);
+			if (!desktop) {
+				panel.style.removeProperty("top");
+				panel.style.removeProperty("left");
+				panel.style.removeProperty("right");
+				panel.style.removeProperty("max-height");
+			} else {
+				syncDesktopPosition(desktopPosition);
+			}
+			panel.dataset.positionReady = "true";
+			panel.setAttribute("aria-hidden", "false");
+		};
+		window.addEventListener("resize", syncMode, { passive: true });
+		const resizeObserver = typeof ResizeObserver === "function" ? new ResizeObserver(syncMode) : null;
+		resizeObserver?.observe(layout);
+		const settleTimer = window.setTimeout(syncMode, 700);
+		state.pageDisposers.add(() => {
+			window.removeEventListener("resize", syncMode);
+			window.clearTimeout(settleTimer);
+			resizeObserver?.disconnect();
+		});
+		syncMode();
+	};
+
+	const renderFriendPending = async ({ force = false } = {}) => {
+		const container = document.querySelector("[data-friend-pending]");
+		const list = container?.querySelector("[data-friend-pending-list]");
+		const counts = [...document.querySelectorAll("[data-friend-pending-count]")];
+		if (!container || !list || FRIEND_APPLY_CONFIG.pending?.enabled === false) return;
+		state.friendPendingContainer = container;
+		const limit = Math.max(1, Math.min(50, Number(container.dataset.limit || FRIEND_APPLY_CONFIG.pending?.maxItems || 12)));
+		const cacheMs = Math.max(0, Number(FRIEND_APPLY_CONFIG.pending?.cacheMinutes || 1) * 60 * 1000);
+		const cached = state.friendPendingCache;
+
+		const renderItems = (items) => {
+			if (!container.isConnected) return;
+			const safeItems = (Array.isArray(items) ? items : []).slice(0, limit);
+			counts.forEach((count) => { count.textContent = String(safeItems.length); });
+			list.innerHTML = safeItems.length
+				? safeItems.map((item) => {
+					const created = new Date(item.createdAt);
+					const date = Number.isNaN(created.getTime())
+						? "日期未知"
+						: new Intl.DateTimeFormat("zh-CN", { year: "numeric", month: "2-digit", day: "2-digit" }).format(created);
+					return `<a class="friend-pending-item" href="${escapeHtml(item.issueUrl)}" target="_blank" rel="noopener noreferrer">
+						<strong>${escapeHtml(item.title || "未命名博客")}</strong>
+						<b>#${escapeHtml(item.number)}</b>
+						<time datetime="${escapeHtml(item.createdAt)}">${escapeHtml(date)}</time>
+					</a>`;
+				}).join("")
+				: `<p class="friend-pending-state">暂无审核中的申请</p>`;
+		};
+
+		if (!force && cached && Date.now() - state.friendPendingCacheAt < cacheMs) {
+			renderItems(cached);
+			return;
+		}
+
+		counts.forEach((count) => { count.textContent = "--"; });
+		list.innerHTML = `<p class="friend-pending-state">正在读取审核队列...</p>`;
+		const controller = createPageAbortController();
+		try {
+			const endpoint = container.dataset.endpoint || FRIEND_APPLY_CONFIG.pending?.endpoint || "/api/friend-pending";
+			const url = new URL(endpoint, window.location.href);
+			if (force) url.searchParams.set("refresh", String(Date.now()));
+			const response = await fetch(url, { headers: { Accept: "application/json" }, cache: force ? "reload" : "default", signal: controller.signal });
+			const result = await response.json().catch(() => ({}));
+			if (!response.ok || !Array.isArray(result.items)) throw new Error(result.message || "Pending list unavailable");
+			const items = result.items.slice().sort((left, right) => Date.parse(right.createdAt || 0) - Date.parse(left.createdAt || 0));
+			state.friendPendingCache = items;
+			state.friendPendingCacheAt = Date.now();
+			renderItems(items);
+		} catch (error) {
+			if (error?.name !== "AbortError" && container.isConnected) {
+				counts.forEach((count) => { count.textContent = "--"; });
+				list.innerHTML = `<p class="friend-pending-state is-error">审核列表暂时无法读取</p>`;
+			}
+		} finally {
+			state.pageAbortControllers.delete(controller);
+		}
+	};
+
 	const initFriendApplyForm = () => {
 		const form = document.querySelector("[data-friend-apply-form]");
 		const status = form?.querySelector("[data-friend-apply-status]");
@@ -732,6 +909,7 @@
 				status.innerHTML = `${escapeHtml(result.message || "申请已提交。")} ${result.issueUrl ? `<a href="${escapeHtml(result.issueUrl)}" target="_blank" rel="noopener noreferrer">查看 Issue</a>` : ""}`;
 				form.reset();
 				window.turnstile?.reset?.();
+				renderFriendPending({ force: true });
 			} catch (error) {
 				if (error?.name !== "AbortError") {
 					status.className = "friend-apply-status is-error";
@@ -1581,6 +1759,25 @@
 		panel.classList.remove("is-empty");
 	};
 
+	const initHeadingLineAnchors = () => {
+		if (HEADING_LINES_CONFIG.enabled === false || HEADING_LINES_CONFIG.clickable === false) return;
+		document.querySelectorAll(".article-body :is(h2, h3, h4, h5, h6)[id]:not([data-heading-line-ready])").forEach((heading) => {
+			heading.dataset.headingLineReady = "true";
+			const anchor = document.createElement("a");
+			anchor.className = "heading-anchor-line";
+			anchor.href = `#${heading.id}`;
+			anchor.setAttribute("aria-label", `定位到标题：${heading.textContent?.trim() || heading.id}`);
+			anchor.addEventListener("click", (event) => {
+				event.preventDefault();
+				const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches || isMinimalMotionEnabled();
+				heading.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+				const hash = `#${encodeURIComponent(heading.id)}`;
+				if (window.location.hash !== hash) history.pushState(history.state, "", `${window.location.pathname}${window.location.search}${hash}`);
+			});
+			heading.appendChild(anchor);
+		});
+	};
+
 	const initTocBar = () => {
 		const tocs = [...document.querySelectorAll(".toc-bar")];
 		if (!tocs.length) return;
@@ -1683,10 +1880,29 @@
 		const currentTime = shell.querySelector("[data-music-current]");
 		const durationTime = shell.querySelector("[data-music-duration]");
 		const progress = shell.querySelector("[data-music-progress]");
+		const localTip = document.querySelector("[data-music-local-tip]");
 		const collapsed = MUSIC_CONFIG.collapsed !== false;
 		const failedTracks = new Set();
+		const loadedCovers = new Set();
+		const coverLoads = new Map();
 		let seeking = false;
 		let activationPending = false;
+		let coverRequestId = 0;
+		let activeTrackIndex = -1;
+		const showLocalVolumeTip = (message, duration) => {
+			if (!localTip || MUSIC_CONFIG.volumeTipLocalEnabled === false) return;
+			window.clearTimeout(state.musicLocalTipTimer);
+			localTip.textContent = message;
+			localTip.hidden = false;
+			localTip.style.setProperty("--music-local-tip-duration", `${duration}ms`);
+			localTip.classList.remove("is-visible");
+			requestAnimationFrame(() => localTip.classList.add("is-visible"));
+			state.musicLocalTipTimer = window.setTimeout(() => {
+				localTip.classList.remove("is-visible");
+				localTip.hidden = true;
+				state.musicLocalTipTimer = null;
+			}, duration);
+		};
 		shell.classList.toggle("is-collapsed", collapsed);
 		trigger?.setAttribute("aria-expanded", String(!collapsed));
 		const setCollapsed = (value) => {
@@ -1700,27 +1916,64 @@
 			if (progress) progress.value = String(Math.round(safeRatio * 1000));
 			if (currentTime && Number.isFinite(displaySeconds)) currentTime.textContent = formatMusicTime(displaySeconds);
 		};
-		const showCover = (url) => {
+		const showCoverFallback = () => {
 			if (!cover || !coverFallback) return;
-			if (!url) {
-				cover.hidden = true;
-				cover.removeAttribute("src");
-				coverFallback.hidden = false;
-				return;
-			}
-			cover.hidden = false;
-			coverFallback.hidden = true;
-			cover.src = url;
+			cover.hidden = true;
+			cover.removeAttribute("src");
+			delete cover.dataset.coverUrl;
+			coverFallback.hidden = false;
 		};
-		cover?.addEventListener("error", () => showCover(""));
-		const syncTrack = (index = 0) => {
+		const loadCover = (url) => {
+			if (!url) return Promise.reject(new Error("Cover URL is empty"));
+			if (loadedCovers.has(url)) return Promise.resolve(url);
+			if (coverLoads.has(url)) return coverLoads.get(url);
+			const retries = Math.max(0, Math.min(5, Number(MUSIC_CONFIG.coverRetryCount || 0)));
+			const retryDelay = Math.max(0, Number(MUSIC_CONFIG.coverRetryDelayMs || 650));
+			const pending = (async () => {
+				for (let attempt = 0; attempt <= retries; attempt += 1) {
+					try {
+						await new Promise((resolve, reject) => {
+							const image = new Image();
+							image.onload = resolve;
+							image.onerror = reject;
+							image.src = url;
+						});
+						loadedCovers.add(url);
+						return url;
+					} catch {
+						if (attempt < retries) await new Promise((resolve) => window.setTimeout(resolve, retryDelay));
+					}
+				}
+				throw new Error("Cover preload failed");
+			})().finally(() => coverLoads.delete(url));
+			coverLoads.set(url, pending);
+			return pending;
+		};
+		cover?.addEventListener("error", showCoverFallback);
+		const syncTrack = (index = 0, { force = false } = {}) => {
 			const tracks = state.musicTracks || [];
-			const track = tracks[Math.max(0, Number(index) || 0)] || tracks[0];
+			const safeIndex = Math.max(0, Math.min(tracks.length - 1, Number(index) || 0));
+			const track = tracks[safeIndex] || tracks[0];
 			if (!track) return;
-			showCover(track.cover);
+			const changed = activeTrackIndex !== safeIndex;
+			activeTrackIndex = safeIndex;
+			const requestId = ++coverRequestId;
 			if (title) title.textContent = track.name;
 			trigger?.setAttribute("title", `${track.name} - ${track.artist}`);
 			trigger?.setAttribute("aria-label", state.musicInstance?.audio?.paused === false ? `暂停 ${track.name}` : `播放 ${track.name}`);
+			if (changed || force || cover?.dataset.coverUrl !== track.cover) {
+				showCoverFallback();
+				loadCover(track.cover).then((url) => {
+					if (requestId !== coverRequestId || activeTrackIndex !== safeIndex || !cover || !coverFallback) return;
+					cover.src = url;
+					cover.dataset.coverUrl = url;
+					cover.hidden = false;
+					coverFallback.hidden = true;
+				}).catch(() => {
+					if (requestId === coverRequestId && activeTrackIndex === safeIndex) showCoverFallback();
+				});
+			}
+			if (tracks.length > 1) loadCover(tracks[(safeIndex + 1) % tracks.length]?.cover).catch(() => {});
 		};
 		const loadPlaylist = async () => {
 			if (Array.isArray(state.musicTracks) && state.musicTracks.length) return state.musicTracks;
@@ -1750,7 +2003,7 @@
 				})).filter((track) => track.url);
 				if (!audio.length) throw new Error("Meting API returned an empty playlist");
 				state.musicTracks = audio;
-				syncTrack(0);
+				syncTrack(0, { force: true });
 				return audio;
 			})().catch((error) => {
 				state.musicPlaylistPromise = null;
@@ -1779,19 +2032,27 @@
 					container: mount,
 					audio,
 					autoplay: MUSIC_CONFIG.autoplay === true,
-					volume: Math.max(0, Math.min(1, Number(MUSIC_CONFIG.volume ?? 0.7))),
+					volume: getMusicVolume(),
 					preload: "metadata",
 					loop: MUSIC_CONFIG.autoNext === false ? "none" : "all",
 					order: MUSIC_CONFIG.sequential === false ? "random" : "list",
 					listFolded: true,
 				});
 				state.musicInstance = player;
+				setMusicVolume(getMusicVolume(), { persist: false });
 				player.on("play", () => {
 					failedTracks.delete(player.list.index);
+					shell.classList.add("has-played");
 					shell.classList.add("is-playing");
 					shell.classList.remove("is-error");
 					setCollapsed(false);
-					syncTrack(player.list.index);
+					if (!state.musicVolumeTipShown && MUSIC_CONFIG.volumeTipEnabled !== false) {
+						state.musicVolumeTipShown = true;
+						const message = MUSIC_CONFIG.volumeTipMessage || "鼠标右键可以调整播放音量";
+						const duration = Math.max(1000, Number(MUSIC_CONFIG.volumeTipDurationMs || 5000));
+						showToast(message, duration);
+						showLocalVolumeTip(message, duration);
+					}
 				});
 				player.on("pause", () => {
 					shell.classList.remove("is-playing");
@@ -1802,10 +2063,15 @@
 				player.on("listswitch", (event) => {
 					setProgress(0, 0);
 					if (durationTime) durationTime.textContent = "00:00";
-					syncTrack(event?.index ?? player.list.index);
+					syncTrack(event?.index ?? player.list.index, { force: true });
 				});
 				player.on("timeupdate", syncPlaybackTime);
-				player.on("loadedmetadata", syncPlaybackTime);
+				player.on("loadedmetadata", () => {
+					if (Number.isFinite(Number(player.list?.index)) && Number(player.list.index) !== activeTrackIndex) {
+						syncTrack(player.list.index, { force: true });
+					}
+					syncPlaybackTime();
+				});
 				player.on("durationchange", syncPlaybackTime);
 				player.on("error", () => {
 					failedTracks.add(player.list.index);
@@ -1867,6 +2133,16 @@
 		if (MOTION_CONFIG.enabled === false) return;
 		const root = document.querySelector("#swup");
 		if (!root) return;
+		if (isMinimalMotionEnabled()) {
+			state.motionObserver?.disconnect?.();
+			state.motionObserver = null;
+			root.querySelectorAll(".motion-reveal").forEach((node) => {
+				node.classList.remove("motion-reveal");
+				node.classList.add("motion-visible");
+				node.style.removeProperty("--motion-delay");
+			});
+			return;
+		}
 		const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 		const mobile = isMobilePerformanceViewport();
 		if (mobile && MOTION_CONFIG.mobileReduceEffects !== false) {
@@ -1881,7 +2157,7 @@
 		const candidates = [...root.querySelectorAll(":scope > *, .post-card, .timeline-year, .taxonomy-card")]
 			.filter((node, index, list) => (
 				list.indexOf(node) === index
-				&& !node.matches(".article-page")
+				&& !node.matches(".article-page, .friend-apply-layout")
 				&& node.getBoundingClientRect().height <= window.innerHeight * 2.5
 			))
 			.slice(0, max);
@@ -1987,7 +2263,7 @@
 	};
 
 	const startKonamiSnow = () => {
-		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || isMinimalMotionEnabled()) return;
 		const duration = Math.max(1000, Number(KONAMI_SNOW_CONFIG.durationMs || 10000));
 		if (!state.snowLayer?.isConnected) {
 			const layer = document.createElement("div");
@@ -2061,6 +2337,7 @@
 		state.stellarDisposer = null;
 		state.friendsContainer = null;
 		state.friendActivityContainer = null;
+		state.friendPendingContainer = null;
 		state.momentsContainer = null;
 		state.latestCommentsContainer = null;
 		state.welcomeNode = null;
@@ -2194,7 +2471,7 @@
 			event.preventDefault();
 			event.stopImmediatePropagation();
 			if (state.postTransitionActive) return;
-			if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+			if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || isMinimalMotionEnabled()) {
 				navigateToPost(url);
 				return;
 			}
@@ -2275,6 +2552,34 @@
 		if (action === "reload") window.location.reload();
 		if (action === "home") window.location.href = "/";
 		if (action === "print") window.print();
+		if (action === "minimal-motion") setMinimalMotionEnabled(!isMinimalMotionEnabled());
+	};
+
+	const setMinimalMotionEnabled = (enabled) => {
+		const nextEnabled = Boolean(enabled);
+		document.documentElement.dataset.minimalMotion = nextEnabled ? "enabled" : "disabled";
+		try {
+			localStorage.setItem(MINIMAL_MOTION_CONFIG.storageKey || "mete0r:minimal-motion:v1", nextEnabled ? "enabled" : "disabled");
+		} catch (error) {
+			// 存储不可用时仍保留本次页面的选择。
+		}
+		if (nextEnabled) {
+			removeKonamiSnow();
+			clearPostTransitionVisuals();
+			state.motionObserver?.disconnect?.();
+			state.motionObserver = null;
+			state.projectTimer && window.clearInterval(state.projectTimer);
+			state.projectTimer = null;
+			document.documentElement.classList.remove("splash-active");
+			document.querySelector("[data-splash]")?.remove();
+		}
+		initPageMotion();
+		window.dispatchEvent(new CustomEvent("astroblog:minimal-motion-change", { detail: { enabled: nextEnabled } }));
+		if (MINIMAL_MOTION_CONFIG.toastEnabled !== false) {
+			showToast(nextEnabled
+				? MINIMAL_MOTION_CONFIG.enabledMessage || "已开启最少动画模式"
+				: MINIMAL_MOTION_CONFIG.disabledMessage || "已关闭最少动画模式", 2600);
+		}
 	};
 
 	const initContextMenu = () => {
@@ -2291,6 +2596,10 @@
 				<button type="button" data-context-action="home" aria-label="首页">⌂</button>
 			</div>
 			<div class="context-menu-list"></div>
+			<div class="context-menu-volume" data-context-volume>
+				<div><span>播放音量</span><output data-context-volume-output>0%</output></div>
+				<input type="range" min="0" max="100" step="1" value="0" data-context-volume-input aria-label="调整播放音量" />
+			</div>
 		`;
 		document.body.appendChild(menu);
 
@@ -2306,7 +2615,27 @@
 		});
 		menu.querySelector(".context-menu-nav").hidden = navButtons.every((button) => button.hidden);
 
+		const volumeControl = menu.querySelector("[data-context-volume]");
+		const volumeInput = menu.querySelector("[data-context-volume-input]");
+		const volumeOutput = menu.querySelector("[data-context-volume-output]");
+		const syncVolumeControl = () => {
+			const percent = Math.round(getMusicVolume() * 100);
+			if (volumeInput) volumeInput.value = String(percent);
+			if (volumeOutput) volumeOutput.textContent = `${percent}%`;
+			if (volumeControl) volumeControl.hidden = MUSIC_CONFIG.volumeControlEnabled === false || !document.querySelector("[data-music-player]");
+		};
+		volumeInput?.addEventListener("input", () => {
+			const volume = setMusicVolume(Number(volumeInput.value) / 100);
+			if (volumeOutput) volumeOutput.textContent = `${Math.round(volume * 100)}%`;
+		});
+		volumeControl?.addEventListener("click", (event) => event.stopPropagation());
+		volumeControl?.addEventListener("pointerdown", (event) => event.stopPropagation());
+
 		menu.addEventListener("click", (event) => {
+			if (event.target.closest("[data-context-volume]")) {
+				event.stopPropagation();
+				return;
+			}
 			const item = event.target.closest("[data-context-action], a[href]");
 			if (!item) return;
 			closeContextMenu();
@@ -2322,15 +2651,15 @@
 				closeContextMenu();
 				return;
 			}
-			if (event.target.closest("input, textarea, select, [contenteditable='true']")) return;
+			const editable = event.target.closest("input, textarea, select, [contenteditable='true']");
+			if (editable && !editable.closest("[data-music-player]")) return;
 			event.preventDefault();
-			try {
-				if (localStorage.getItem("mete0r:context-menu-tip-shown") !== "true") {
-					localStorage.setItem("mete0r:context-menu-tip-shown", "true");
-					showToast("温馨提示：按住Ctrl再点击右键即可用浏览器自带右键菜单", 5000);
-				}
-			} catch (error) {
-				showToast("温馨提示：按住Ctrl再点击右键即可用浏览器自带右键菜单", 5000);
+			if (CONTEXT_CONFIG.tipEnabled !== false && !state.contextMenuTipShown) {
+				state.contextMenuTipShown = true;
+				showToast(
+					CONTEXT_CONFIG.tipMessage || "温馨提示：按住Ctrl再点击右键即可用浏览器自带右键菜单",
+					Math.max(1000, Number(CONTEXT_CONFIG.tipDurationMs || 5000)),
+				);
 			}
 			const list = menu.querySelector(".context-menu-list");
 			const hasComments = Boolean(document.querySelector("#comments"));
@@ -2341,11 +2670,18 @@
 				CONTEXT_CONFIG.showComments !== false && hasComments && { label: "跳转评论区", icon: "☵", href: CONTEXT_CONFIG.commentsUrl || "#comments" },
 				CONTEXT_CONFIG.showPrint !== false && { label: "打印整个页面", icon: "▤", action: "print" },
 				CONTEXT_CONFIG.showStatement !== false && { label: "网站声明", icon: "●", href: CONTEXT_CONFIG.statementUrl || "/about/" },
+				MINIMAL_MOTION_CONFIG.enabled !== false && {
+					label: `${MINIMAL_MOTION_CONFIG.buttonText || "最少动画模式"}：${isMinimalMotionEnabled() ? "开" : "关"}`,
+					icon: "◐",
+					action: "minimal-motion",
+					active: isMinimalMotionEnabled(),
+				},
 			].filter(Boolean);
 			list.innerHTML = items.map((item) => item.href
 				? `<a href="${escapeHtml(item.href)}"><span>${escapeHtml(item.icon)}</span>${escapeHtml(item.label)}</a>`
-				: `<button type="button" data-context-action="${escapeHtml(item.action)}"><span>${escapeHtml(item.icon)}</span>${escapeHtml(item.label)}</button>`
+				: `<button type="button" data-context-action="${escapeHtml(item.action)}" class="${item.active ? "is-active" : ""}"${item.action === "minimal-motion" ? ` aria-pressed="${item.active ? "true" : "false"}"` : ""}><span>${escapeHtml(item.icon)}</span>${escapeHtml(item.label)}</button>`
 			).join("");
+			syncVolumeControl();
 
 			menu.classList.add("is-open");
 			const padding = 12;
@@ -2364,7 +2700,7 @@
 		const currentPath = window.location.pathname.replace(/\/+$/, "") || "/";
 		const homeOnly = SPLASH_CONFIG.homeOnly !== false;
 		const disableOnMobile = MOTION_CONFIG.mobileDisableSplash !== false && isMobilePerformanceViewport();
-		if (SPLASH_CONFIG.enabled === false || disableOnMobile || (homeOnly && currentPath !== "/")) {
+		if (SPLASH_CONFIG.enabled === false || disableOnMobile || isMinimalMotionEnabled() || (homeOnly && currentPath !== "/")) {
 			splash.remove();
 			document.documentElement.classList.remove("splash-active");
 			return;
@@ -2412,6 +2748,8 @@
 		runSplash();
 		renderFriends();
 		renderFriendActivity();
+		initFriendPendingDrawer();
+		renderFriendPending();
 		renderMoments();
 		renderLatestComments();
 		initCarousels();
@@ -2429,6 +2767,7 @@
 		initStellarImages();
 		initMermaid();
 		syncMobileToc();
+		initHeadingLineAnchors();
 		initTocBar();
 		initMobileDrawer();
 		initStellarMedia();

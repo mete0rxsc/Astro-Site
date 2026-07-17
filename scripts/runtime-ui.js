@@ -64,6 +64,8 @@
 		artalkImageObserver: null,
 		artalkThemeObserver: null,
 		artalkThemeFrame: null,
+		artalkLoginObserver: null,
+		artalkLoginDisposer: null,
 		artalkImagePreviewBound: false,
 		postTransitionBound: false,
 		postTransitionActive: false,
@@ -1207,6 +1209,310 @@
 		apply();
 	};
 
+	const createArtalkLoginVisual = () => {
+		const visual = document.createElement("aside");
+		visual.className = "artalk-login-visual";
+		visual.dataset.artalkLoginVisual = "true";
+		visual.setAttribute("aria-hidden", "true");
+		visual.innerHTML = `
+			<div class="artalk-login-character-stage" data-artalk-login-stage>
+				<div class="artalk-login-character is-accent">
+					<span class="artalk-login-eyes has-whites">
+						<i class="artalk-login-eye"><b class="artalk-login-pupil"></b></i>
+						<i class="artalk-login-eye"><b class="artalk-login-pupil"></b></i>
+					</span>
+				</div>
+				<div class="artalk-login-character is-ink">
+					<span class="artalk-login-eyes has-whites">
+						<i class="artalk-login-eye"><b class="artalk-login-pupil"></b></i>
+						<i class="artalk-login-eye"><b class="artalk-login-pupil"></b></i>
+					</span>
+				</div>
+				<div class="artalk-login-character is-rose">
+					<span class="artalk-login-eyes is-dots">
+						<i class="artalk-login-pupil"></i>
+						<i class="artalk-login-pupil"></i>
+					</span>
+				</div>
+				<div class="artalk-login-character is-gold">
+					<span class="artalk-login-eyes is-dots">
+						<i class="artalk-login-pupil"></i>
+						<i class="artalk-login-pupil"></i>
+					</span>
+					<i class="artalk-login-mouth"></i>
+				</div>
+			</div>`;
+		return visual;
+	};
+
+	const createArtalkAnonymousForm = (config = {}) => {
+		const form = document.createElement("form");
+		form.className = "artalk-anonymous-form";
+		form.dataset.artalkAnonymousForm = "true";
+		form.noValidate = true;
+		form.innerHTML = `
+			<div class="artalk-anonymous-form-heading">
+				<h3 data-artalk-anonymous-title></h3>
+			</div>
+			<label class="artalk-anonymous-field">
+				<span><span data-artalk-anonymous-name-label></span><b aria-hidden="true">*</b></span>
+				<input type="text" name="name" autocomplete="nickname" required maxlength="64">
+			</label>
+			<label class="artalk-anonymous-field">
+				<span><span data-artalk-anonymous-email-label></span><b aria-hidden="true">*</b></span>
+				<input type="email" name="email" autocomplete="email" required maxlength="254">
+			</label>
+			<label class="artalk-anonymous-field">
+				<span data-artalk-anonymous-link-label></span>
+				<input type="text" name="link" autocomplete="url" maxlength="512">
+			</label>
+			<p class="artalk-anonymous-form-error" data-artalk-anonymous-error role="alert" aria-live="polite"></p>
+			<div class="artalk-anonymous-form-actions">
+				<button type="button" class="artalk-anonymous-back" data-artalk-anonymous-back></button>
+				<button type="submit" class="artalk-anonymous-confirm" data-artalk-anonymous-confirm></button>
+			</div>`;
+
+		form.querySelector("[data-artalk-anonymous-title]").textContent = config.title || "填写评论信息";
+		form.querySelector("[data-artalk-anonymous-name-label]").textContent = config.nameLabel || "昵称";
+		form.querySelector("[data-artalk-anonymous-email-label]").textContent = config.emailLabel || "邮箱";
+		form.querySelector("[data-artalk-anonymous-link-label]").textContent = config.linkLabel || "网址";
+		form.querySelector('input[name="name"]').placeholder = config.namePlaceholder || "请输入昵称";
+		form.querySelector('input[name="email"]').placeholder = config.emailPlaceholder || "请输入邮箱";
+		form.querySelector('input[name="link"]').placeholder = config.linkPlaceholder || "https://example.com";
+		form.querySelector("[data-artalk-anonymous-back]").textContent = config.backText || "返回登录方式";
+		form.querySelector("[data-artalk-anonymous-confirm]").textContent = config.confirmText || "确认并继续评论";
+		return form;
+	};
+
+	const initArtalkLoginVisual = (config = {}) => {
+		state.artalkLoginDisposer?.();
+		state.artalkLoginDisposer = null;
+		state.artalkLoginObserver?.disconnect?.();
+		state.artalkLoginObserver = null;
+		if (config?.enabled === false) return;
+
+		const minWidth = Math.max(720, Number(config.desktopMinWidthPx ?? 900) || 900);
+		const panelWidth = Math.max(220, Math.min(420, Number(config.panelWidthPx ?? 300) || 300));
+		const dialogHeight = Math.max(360, Math.min(640, Number(config.dialogHeightPx ?? 500) || 500));
+		const bindings = new Map();
+		let disposed = false;
+
+		const motionAllowed = () => config.motionEnabled !== false
+			&& document.documentElement.dataset.minimalMotion !== "enabled"
+			&& !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+		const updateLayout = (wrapper) => {
+			wrapper.dataset.artalkLoginLayout = window.innerWidth >= minWidth ? "wide" : "compact";
+		};
+
+		const bindLoginDialog = (wrapper) => {
+			if (bindings.has(wrapper) || !wrapper.querySelector(".atk-methods-page")) return;
+			const dialog = wrapper.querySelector(":scope > .atk-auth-plugin-dialog");
+			if (!dialog) return;
+			const visual = createArtalkLoginVisual();
+			wrapper.insertBefore(visual, dialog);
+			wrapper.classList.add("has-artalk-login-visual");
+			wrapper.dataset.artalkLoginFlow = "true";
+			wrapper.style.setProperty("--artalk-login-visual-width", `${panelWidth}px`);
+			wrapper.style.setProperty("--artalk-login-dialog-height", `${dialogHeight}px`);
+			visual.dataset.artalkLoginBlinking = config.blinking === false ? "disabled" : "enabled";
+			visual.dataset.artalkLoginMotion = config.motionEnabled === false ? "disabled" : "enabled";
+			updateLayout(wrapper);
+
+			const stage = visual.querySelector("[data-artalk-login-stage]");
+			const viewWrap = dialog.querySelector(":scope > .atk-view-wrap");
+			const skipFormConfig = config.skipForm || {};
+			let pointerFrame = null;
+			let focusTimer = null;
+			let anonymousForm = null;
+			let activeSkipItem = null;
+			let replayingSkip = false;
+			const pointerMove = (event) => {
+				if (config.pointerTracking === false || !motionAllowed() || !stage) return;
+				if (pointerFrame) window.cancelAnimationFrame(pointerFrame);
+				pointerFrame = window.requestAnimationFrame(() => {
+					pointerFrame = null;
+					const rect = stage.getBoundingClientRect();
+					const x = Math.max(-1, Math.min(1, (event.clientX - (rect.left + rect.width / 2)) / Math.max(1, rect.width / 2)));
+					const y = Math.max(-1, Math.min(1, (event.clientY - (rect.top + rect.height / 2)) / Math.max(1, rect.height / 2)));
+					stage.style.setProperty("--artalk-login-look-x", `${(x * 4.5).toFixed(2)}px`);
+					stage.style.setProperty("--artalk-login-look-y", `${(y * 3.5).toFixed(2)}px`);
+					stage.style.setProperty("--artalk-login-body-skew", `${(-x * 3).toFixed(2)}deg`);
+				});
+			};
+			const pointerLeave = () => {
+				stage?.style.removeProperty("--artalk-login-look-x");
+				stage?.style.removeProperty("--artalk-login-look-y");
+				stage?.style.removeProperty("--artalk-login-body-skew");
+			};
+			const getEditorField = (name) => {
+				const editorHeader = document.querySelector("[data-artalk] .atk-main-editor > .atk-header")
+					|| document.querySelector(".comment-section .atk-main-editor > .atk-header");
+				if (!editorHeader) return null;
+				return editorHeader.querySelector(`input[name="${name}"], input.atk-${name}`);
+			};
+			const setEditorFieldValue = (field, value) => {
+				const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+				if (setter) setter.call(field, value);
+				else field.value = value;
+				field.dispatchEvent(new Event("input", { bubbles: true, composed: true }));
+				field.dispatchEvent(new Event("change", { bubbles: true, composed: true }));
+			};
+			const restoreNativeView = ({ focusSkip = false } = {}) => {
+				if (!anonymousForm) return;
+				anonymousForm.remove();
+				anonymousForm = null;
+				viewWrap?.classList.remove("has-artalk-anonymous-form");
+				viewWrap?.querySelectorAll(":scope > [data-artalk-login-native-hidden]").forEach((node) => {
+					node.hidden = false;
+					node.removeAttribute("aria-hidden");
+					delete node.dataset.artalkLoginNativeHidden;
+				});
+				wrapper.classList.remove("is-artalk-anonymous-form");
+				if (focusSkip) activeSkipItem?.focus?.();
+				activeSkipItem = null;
+			};
+			const showAnonymousForm = (skipItem) => {
+				if (!viewWrap || anonymousForm) return;
+				activeSkipItem = skipItem;
+				anonymousForm = createArtalkAnonymousForm(skipFormConfig);
+				viewWrap.querySelectorAll(":scope > *").forEach((node) => {
+					node.hidden = true;
+					node.setAttribute("aria-hidden", "true");
+					node.dataset.artalkLoginNativeHidden = "true";
+				});
+				viewWrap.append(anonymousForm);
+				viewWrap.classList.add("has-artalk-anonymous-form");
+				wrapper.classList.add("is-artalk-anonymous-form");
+
+				["name", "email", "link"].forEach((name) => {
+					const source = getEditorField(name);
+					const target = anonymousForm?.querySelector(`input[name="${name}"]`);
+					if (source && target) target.value = source.value || "";
+				});
+				anonymousForm.querySelector('input[name="name"]')?.focus();
+			};
+			const submitAnonymousForm = (event) => {
+				event.preventDefault();
+				if (!anonymousForm || !activeSkipItem) return;
+				const error = anonymousForm.querySelector("[data-artalk-anonymous-error]");
+				const fields = Object.fromEntries(["name", "email", "link"].map((name) => [
+					name,
+					anonymousForm.querySelector(`input[name="${name}"]`),
+				]));
+				Object.values(fields).forEach((field) => { field.value = field.value.trim(); });
+				anonymousForm.classList.add("was-validated");
+				if (!anonymousForm.checkValidity()) {
+					if (error) error.textContent = skipFormConfig.validationMessage || "请填写昵称和有效的邮箱地址。";
+					anonymousForm.reportValidity();
+					return;
+				}
+				const editorFields = Object.fromEntries(["name", "email", "link"].map((name) => [name, getEditorField(name)]));
+				if (!editorFields.name || !editorFields.email || !editorFields.link) {
+					if (error) error.textContent = skipFormConfig.unavailableMessage || "评论信息输入框尚未准备好，请关闭弹窗后重试。";
+					return;
+				}
+				Object.entries(editorFields).forEach(([name, field]) => setEditorFieldValue(field, fields[name].value));
+				const skipItem = activeSkipItem;
+				restoreNativeView();
+				replayingSkip = true;
+				try {
+					skipItem.click();
+				} finally {
+					replayingSkip = false;
+				}
+			};
+			const captureSkip = (event) => {
+				const skipItem = event.target?.closest?.('.atk-method-item[data-method="skip"]');
+				if (!skipItem || !wrapper.contains(skipItem) || replayingSkip || skipFormConfig.enabled === false) return;
+				event.preventDefault();
+				event.stopPropagation();
+				event.stopImmediatePropagation();
+				showAnonymousForm(skipItem);
+			};
+			const anonymousFormClick = (event) => {
+				if (event.target?.closest?.("[data-artalk-anonymous-back]")) restoreNativeView({ focusSkip: true });
+			};
+			const anonymousFormSubmit = (event) => {
+				if (event.target?.matches?.("[data-artalk-anonymous-form]")) submitAnonymousForm(event);
+			};
+			const syncInputReaction = (target) => {
+				if (config.inputReaction === false || !motionAllowed()) {
+					wrapper.classList.remove("is-artalk-login-typing", "is-artalk-login-password", "has-artalk-login-password-value", "is-artalk-login-email-look-away");
+					return;
+				}
+				const input = target?.closest?.(".atk-auth-plugin-dialog input");
+				const isAnonymousEmail = skipFormConfig.emailLookAwayReaction !== false
+					&& input?.name === "email"
+					&& Boolean(input.closest("[data-artalk-anonymous-form]"));
+				const isPassword = input?.type === "password";
+				wrapper.classList.toggle("is-artalk-login-typing", Boolean(input && !isPassword && !isAnonymousEmail));
+				wrapper.classList.toggle("is-artalk-login-password", Boolean(isPassword));
+				wrapper.classList.toggle("has-artalk-login-password-value", Boolean(isPassword && input.value));
+				wrapper.classList.toggle("is-artalk-login-email-look-away", Boolean(isAnonymousEmail));
+			};
+			const focusIn = (event) => syncInputReaction(event.target);
+			const focusOut = () => {
+				window.clearTimeout(focusTimer);
+				focusTimer = window.setTimeout(() => syncInputReaction(document.activeElement), 0);
+			};
+			const input = (event) => syncInputReaction(event.target);
+
+			wrapper.addEventListener("pointermove", pointerMove, { passive: true });
+			wrapper.addEventListener("pointerleave", pointerLeave);
+			wrapper.addEventListener("click", captureSkip, true);
+			wrapper.addEventListener("click", anonymousFormClick);
+			wrapper.addEventListener("submit", anonymousFormSubmit);
+			wrapper.addEventListener("focusin", focusIn);
+			wrapper.addEventListener("focusout", focusOut);
+			wrapper.addEventListener("input", input);
+
+			bindings.set(wrapper, () => {
+				if (pointerFrame) window.cancelAnimationFrame(pointerFrame);
+				window.clearTimeout(focusTimer);
+				wrapper.removeEventListener("pointermove", pointerMove);
+				wrapper.removeEventListener("pointerleave", pointerLeave);
+				wrapper.removeEventListener("click", captureSkip, true);
+				wrapper.removeEventListener("click", anonymousFormClick);
+				wrapper.removeEventListener("submit", anonymousFormSubmit);
+				wrapper.removeEventListener("focusin", focusIn);
+				wrapper.removeEventListener("focusout", focusOut);
+				wrapper.removeEventListener("input", input);
+				restoreNativeView();
+				visual.remove();
+				wrapper.classList.remove("has-artalk-login-visual", "is-artalk-login-typing", "is-artalk-login-password", "has-artalk-login-password-value", "is-artalk-login-email-look-away", "is-artalk-anonymous-form");
+				delete wrapper.dataset.artalkLoginFlow;
+				delete wrapper.dataset.artalkLoginLayout;
+				wrapper.style.removeProperty("--artalk-login-visual-width");
+				wrapper.style.removeProperty("--artalk-login-dialog-height");
+			});
+		};
+
+		const scan = () => {
+			if (disposed) return;
+			document.querySelectorAll(".atk-auth-plugin-dialog-wrap").forEach(bindLoginDialog);
+			bindings.forEach((dispose, wrapper) => {
+				if (wrapper.isConnected) return;
+				dispose();
+				bindings.delete(wrapper);
+			});
+		};
+		const onResize = () => bindings.forEach((_, wrapper) => updateLayout(wrapper));
+		window.addEventListener("resize", onResize, { passive: true });
+		state.artalkLoginObserver = new MutationObserver(scan);
+		state.artalkLoginObserver.observe(document.body, { childList: true, subtree: true });
+		scan();
+
+		state.artalkLoginDisposer = () => {
+			disposed = true;
+			state.artalkLoginObserver?.disconnect?.();
+			state.artalkLoginObserver = null;
+			window.removeEventListener("resize", onResize);
+			bindings.forEach((dispose) => dispose());
+			bindings.clear();
+		};
+	};
+
 	const initArtalk = async () => {
 		const container = document.querySelector("[data-artalk]");
 		const configNode = document.querySelector("#artalk-config");
@@ -1243,6 +1549,7 @@
 			await waitForArtalkDom(container, safeTimeoutMs);
 			syncArtalkTheme();
 			initArtalkAppearance(container, config.appearance);
+			initArtalkLoginVisual(config.appearance?.loginVisual);
 			initArtalkPlane();
 			container.dataset.ready = "true";
 			setArtalkStatus(container, "ready", config);
@@ -2449,6 +2756,10 @@
 		state.artalkImageObserver = null;
 		state.artalkThemeObserver?.disconnect?.();
 		state.artalkThemeObserver = null;
+		state.artalkLoginObserver?.disconnect?.();
+		state.artalkLoginObserver = null;
+		state.artalkLoginDisposer?.();
+		state.artalkLoginDisposer = null;
 		if (state.artalkThemeFrame) {
 			window.cancelAnimationFrame(state.artalkThemeFrame);
 			state.artalkThemeFrame = null;

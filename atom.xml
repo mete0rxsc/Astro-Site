@@ -1,79 +1,48 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Mete0r&apos;s Blog</title><description>Mete0r的虚拟小世界</description><link>https://www.xscnet.cn/</link><item><title>更新简报01</title><link>https://www.xscnet.cn/posts/p4220260716/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p4220260716/</guid><description>博客正式迈入B测v1阶段，本次更新内容丰富且改动幅度较大。完成无Github账号友链自助申请功能开发，优化Artalk评论区样式与适配效果，升级音乐播放器交互体验，同时完成原Hexo Stellar主题各类标签的迁移适配。文末附主页神秘彩蛋，欢迎大家探索体验。</description><pubDate>Thu, 16 Jul 2026 00:00:00 GMT</pubDate></item><item><title>香港三日游 | 独特的体验</title><link>https://www.xscnet.cn/posts/p4120260710/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p4120260710/</guid><description>本篇记录与友人同行的香港三日之旅，从深圳口岸过关，办理本地银行卡与电话卡，逛数码商铺、打卡全球首间麦当劳 Next 概念店、品尝特色拉面，夜游维多利亚港，浅体验本地赛马。文中清晰区分港澳与内地博彩相关法律，提醒理性娱乐、远离赌博，记录湿热旅途与往返口岸的真实见闻。</description><pubDate>Fri, 10 Jul 2026 00:00:00 GMT</pubDate></item><item><title>新的博客框架！全量上线！</title><link>https://www.xscnet.cn/posts/p4020260630/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p4020260630/</guid><description>本站博客正式完成框架迭代，从 Hexo 迁移至 Astro 自建定制主题！搭载流畅动画、多配色模式、智能搜索等实用功能，适配全设备，联动动态友链、说说等特色页面，性能大幅优化，后续将持续完善站点功能与体验。</description><pubDate>Tue, 30 Jun 2026 00:00:00 GMT</pubDate></item><item><title>各位好久不见 | 关于后期的规划</title><link>https://www.xscnet.cn/posts/p3920260627/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3920260627/</guid><description>热衷于静态博客架构优化与前端技术实践，深耕站点重构、性能调优与框架迭代工作，致力于打磨轻量化、高适配的个人博客站点。同时记录高考后的成长感悟与人生规划，在技术深耕与生活成长中持续沉淀、不断前行。</description><pubDate>Sat, 27 Jun 2026 00:00:00 GMT</pubDate></item><item><title>AI导致的乱象以及个人形象与大家的初次见面</title><link>https://www.xscnet.cn/posts/p3820260502/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3820260502/</guid><description>五一假期临近高考，分享日常备考与学习感悟，结合瑞文推理测验实测发现过度依赖AI会造成推理能力下滑，从独立思考、主观能动性、专注力、认知卸载四方面剖析AI滥用带来的大脑与认知乱象，引用多份权威资料佐证危害，谈及算法碎片化信息侵蚀思维，同时公布个人虚拟形象流星同学正式登场，博客小幅优化细节Bug，立下戒过度依赖AI、回归自主思考学习的决心。</description><pubDate>Sat, 02 May 2026 00:00:00 GMT</pubDate></item><item><title>游戏体验：《PRAGMATA》(识质存在)</title><link>https://www.xscnet.cn/posts/p3720260420/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3720260420/</guid><description>卡普空2026年科幻新作《PRAGMATA》（识质存在）实测体验！IGN 8分、Metacritic 86分好评加持，以月球基地为舞台，讲述人类调查员休与仿生女童戴安娜的羁绊之旅。独特的“黑客+射击”战斗机制、细腻的角色塑造、极佳的优化表现，打破单机游戏审美疲劳，成为2026年迄今为止最让人眼前一亮的科幻动作冒险佳作。</description><pubDate>Mon, 20 Apr 2026 00:00:00 GMT</pubDate></item><item><title>轻量化个人主页</title><link>https://www.xscnet.cn/posts/p3620260418/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3620260418/</guid><description>本文作者为打造个性化个人主页，开发了开源项目 minimal-homepage，核心特色是轻量化设计、高度集成配置 —— 无需修改多个文件，仅通过 main.config.js 即可完成所有设置，还支持显色模式切换、Github 信息对接、RSS 源自定义等实用功能，适配个人主页的简洁需求。项目部署极为便捷，提供 npm 和 git 两种简单安装方式，复制粘贴命令即可完成操作，后续可轻松部署至 Github Pages、Vercel 等平台，步骤简单易懂。这是作者首个正式开源项目，解决了市面模板臃肿、配置繁琐的痛点，欢迎用户使用并提出建议。</description><pubDate>Sat, 18 Apr 2026 00:00:00 GMT</pubDate></item><item><title>使用Hexo搭建自己的博客</title><link>https://www.xscnet.cn/posts/p3520260403/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3520260403/</guid><description>本文为新手保姆级 Hexo 博客搭建教程，详细记录 NodeJS、Git、Hexo 框架的安装，Stellar 主题配置，以及 Artalk 评论、Lsky 图床部署和友链页面搭建，助力新手快速上手，加入博客圈，用文字留存热爱。</description><pubDate>Fri, 03 Apr 2026 00:00:00 GMT</pubDate></item><item><title>博客源站IP泄露的两种主要方式与防护指南</title><link>https://www.xscnet.cn/posts/p3420260329/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3420260329/</guid><description>源站IP泄露是博客安全中常见但容易被忽视的问题。本文结合实际案例，详细分析了邮件推送和TLS/SSL证书两种泄露源站IP的典型途径，包括其原理、成因以及具体排查方式。同时，文章提供了使用阿里云邮件推送服务、关闭源站Web端口、配置默认假证书等实用的防护方案，帮助博主在不影响正常功能的前提下有效隐藏源站IP，提升网站整体安全性。</description><pubDate>Sun, 29 Mar 2026 00:00:00 GMT</pubDate></item><item><title>三月小记：春雨、体检与博客二三事</title><link>https://www.xscnet.cn/posts/p3320260325/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3320260325/</guid><description>等一场姗姗来迟的东北春日，记一次十八岁的体检，再为博客添一处安放琐碎的角落——三月，在平凡里悄悄生长。</description><pubDate>Wed, 25 Mar 2026 00:00:00 GMT</pubDate></item><item><title>近期随笔：对生活的总结和对博客主题的探索</title><link>https://www.xscnet.cn/posts/p3220260307/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3220260307/</guid><description>周六暂别学业压力，反思游戏从童年消遣变为现实逃避的历程。随着高考临近，决定淡出游戏圈。利用闲暇时间，将博客框架由Valaxy迁移至Hexo，并深入研究Hexo的优秀生态，特别是基于GitHub Actions的自动化友链管理方案。在折腾技术中找回快乐，实现游戏“祛魅”。</description><pubDate>Sat, 07 Mar 2026 00:00:00 GMT</pubDate></item><item><title>博客框架更新！</title><link>https://www.xscnet.cn/posts/p3120260303/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3120260303/</guid><description>站长将博客从Valaxy迁移至Hexo，并利用GitHub Actions实现了从代码推送、自动构建到阿里云服务器部署的全自动化流水线，确保了博客的稳定运行</description><pubDate>Wed, 04 Mar 2026 00:00:00 GMT</pubDate></item><item><title>各位，好久不见!</title><link>https://www.xscnet.cn/posts/p3020260228/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3020260228/</guid><description>站在十八岁的门槛上，在东北萧瑟的冬日里，记录下关于高考、成长与博客的点滴。从代码小白到坚持探索的站长，变的是身份与职责，不变的是对生活的热爱。虽有短暂告别，但未来重构计划已在路上。</description><pubDate>Sat, 28 Feb 2026 00:00:00 GMT</pubDate></item><item><title>致歉通知</title><link>https://www.xscnet.cn/posts/p2920251025/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p2920251025/</guid><description>这是一封致歉信：作为一名高三学生，因学业原因不得不暂时告别博客圈。我承诺在2026年6月高考后回归，届时将恢复内容更新。感谢各位的理解与支持！</description><pubDate>Sat, 25 Oct 2025 00:00:00 GMT</pubDate></item><item><title>最近的小事</title><link>https://www.xscnet.cn/posts/p2820250829/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p2820250829/</guid><description>阔别一月回归，分享近况：陪伴家人、沉迷科幻小说《二级文明有二向箔很合理吧》与游戏《戴森球计划》，并自主开发了存档同步工具解决游戏痛点。</description><pubDate>Fri, 29 Aug 2025 09:00:00 GMT</pubDate></item><item><title>站点更新！CDN优化！腾讯EO白嫖经历</title><link>https://www.xscnet.cn/posts/p2620250716/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p2620250716/</guid><description>这篇文章主要讲了博主半个月来因筹划优化计划导致博客访问异常的情况，随后介绍了博客的两项更新：更换自建图床解决原图床流量异常引发的 SSL 安全问题，以及借助技术支持在后端完成评论区定期备份设置。还分享了接入腾讯云 EdgeOne 加速平台的经历，包括三种激活码获取方式、实操体验及跨厂商对接的 SSL 问题解决方案，最后总结 EO 对静态博客友好，能降低建站成本</description><pubDate>Wed, 16 Jul 2025 14:32:00 GMT</pubDate></item><item><title>被迫购新的充电宝</title><link>https://www.xscnet.cn/posts/p27202507162/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p27202507162/</guid><description>这篇文章主要讲了作者因民航局新规（6 月 28 日起禁止携带无 3C 标识、标识不清晰等充电宝登机），且自己的充电宝均为 2024 年 8 月前购买、无 3C 标识，被迫购买了酷态科新充电宝，并介绍了该充电宝的特点；同时还提及罗马仕充电宝因电芯质量等问题频发安全事故，分析了当前充电宝市场因恶性竞争压缩成本导致产品存在安全隐患的现状</description><pubDate>Wed, 16 Jul 2025 09:05:00 GMT</pubDate></item><item><title>音乐推荐:莫愁乡</title><link>https://www.xscnet.cn/posts/p2520250703/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p2520250703/</guid><description>最近刷视频刷到了亞細亞曠世奇才唱的这首莫愁乡，听了之后才发现是一位新晋说唱歌手唱的好歌，本篇主要是为分享歌曲并作简单评价，但我的评价仅作参考使用，具体还需要看自己听过之后的感受啦</description><pubDate>Thu, 03 Jul 2025 00:00:00 GMT</pubDate></item><item><title>2025六月小结:长时间的等待</title><link>https://www.xscnet.cn/posts/p2420250629/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p2420250629/</guid><description>先和各位博友站长们道个歉,失踪了这么长时间还没和大家互访</description><pubDate>Sun, 29 Jun 2025 00:00:00 GMT</pubDate></item><item><title>2025五月小结:音乐节初体验</title><link>https://www.xscnet.cn/posts/p2320250524/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p2320250524/</guid><description>   
-            
-                      
-                
-                   
-                                                             
-               
-     </description><pubDate>Sat, 24 May 2025 00:00:00 GMT</pubDate></item><item><title>彼方的她-Aliya</title><link>https://www.xscnet.cn/posts/p2220250518/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p2220250518/</guid><description>Aliya是理科生的理想型!玩家并非扮演游戏角色，而是真实的参与到游戏中，而且游戏时间与现实时间同步，所以会给人有一种很强的沉浸感，这是前所未有的。同时，也有很多细节，比如说心率，不同的情况下Aliya心率都会变化，将程序挂后台Aliya给你发信息你的Windows还会弹窗推送给你，仿佛这真的是一个活生生的人一样。</description><pubDate>Sun, 18 May 2025 00:00:00 GMT</pubDate></item><item><title>Believe</title><link>https://www.xscnet.cn/posts/p2120250511/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p2120250511/</guid><description>这篇文章分享了一首歌曲《Believe》以及两部关于2018年泰国洞穴救援事件的影视作品——纪录片《泰国洞穴救援》和剧情片《十三条命》。作者被洞穴潜水这一极限运动吸引，感慨于救援人员的英勇精神，并立下未来尝试洞穴潜水的目标，表达了对生命的热爱与冒险的向往。</description><pubDate>Sun, 11 May 2025 00:00:00 GMT</pubDate></item><item><title>2025四月小结</title><link>https://www.xscnet.cn/posts/p1920250501/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p1920250501/</guid><description>更新博客、学习调整、做了两个小工具、准备换新域名。</description><pubDate>Thu, 01 May 2025 19:00:00 GMT</pubDate></item><item><title>下载抖音表情包</title><link>https://www.xscnet.cn/posts/P2020250501/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/P2020250501/</guid><description>一款基于 Python 的自动化抓包下载工具，用于批量获取抖音私信表情包（支持 .jpg、.jpeg、.webp、.png、.gif 格式）。自动抓包 批量下载 格式兼容. 总结：工具通过自动化抓包简化了抖音表情包的获取流程，适合技术研究，但需注意合法使用</description><pubDate>Thu, 01 May 2025 08:00:00 GMT</pubDate></item><item><title>网易云VIP歌曲解析</title><link>https://www.xscnet.cn/posts/p1820250427/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p1820250427/</guid><description>网易云VIP歌曲解析，GitHub仓库地址:https://github.com/mete0rxsc/NetEase-Cloud-VIP-Song-Analysis，请注重版权意识，此软件仅作为学习使用</description><pubDate>Sun, 27 Apr 2025 21:36:36 GMT</pubDate></item><item><title>好用的开源项目</title><link>https://www.xscnet.cn/posts/p1720250426Links/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p1720250426Links/</guid><description>总结了我感觉玄离199视频中提到的好用的开源项目</description><pubDate>Sat, 26 Apr 2025 00:00:00 GMT</pubDate></item><item><title>我爱科幻</title><link>https://www.xscnet.cn/posts/p1620250424/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p1620250424/</guid><description>科幻YYDS</description><pubDate>Thu, 24 Apr 2025 00:00:00 GMT</pubDate></item><item><title>(五)</title><link>https://www.xscnet.cn/posts/p1520250423/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p1520250423/</guid><description>四月中旬的小总结</description><pubDate>Wed, 23 Apr 2025 00:00:00 GMT</pubDate></item><item><title>(四)</title><link>https://www.xscnet.cn/posts/p1420250415/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p1420250415/</guid><description>   
-            
-          
-                
-                   
-              
-     
-      
-   
-::: zh-CN
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>Mete0r&apos;s Blog</title><description>Mete0r的虚拟小世界</description><link>https://www.xscnet.cn/</link><item><title>更新简报01</title><link>https://www.xscnet.cn/posts/p4220260716/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p4220260716/</guid><description>博客正式迈入B测v1阶段，本次更新内容丰富且改动幅度较大。完成无Github账号友链自助申请功能开发，优化Artalk评论区样式与适配效果，升级音乐播放器交互体验，同时完成原Hexo Stellar主题各类标签的迁移适配。文末附主页神秘彩蛋，欢迎大家探索体验。</description><pubDate>Thu, 16 Jul 2026 00:00:00 GMT</pubDate></item><item><title>香港三日游 | 独特的体验</title><link>https://www.xscnet.cn/posts/p4120260710/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p4120260710/</guid><description>本篇记录与友人同行的香港三日之旅，从深圳口岸过关，办理本地银行卡与电话卡，逛数码商铺、打卡全球首间麦当劳 Next 概念店、品尝特色拉面，夜游维多利亚港，浅体验本地赛马。文中清晰区分港澳与内地博彩相关法律，提醒理性娱乐、远离赌博，记录湿热旅途与往返口岸的真实见闻。</description><pubDate>Fri, 10 Jul 2026 00:00:00 GMT</pubDate></item><item><title>新的博客框架！全量上线！</title><link>https://www.xscnet.cn/posts/p4020260630/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p4020260630/</guid><description>本站博客正式完成框架迭代，从 Hexo 迁移至 Astro 自建定制主题！搭载流畅动画、多配色模式、智能搜索等实用功能，适配全设备，联动动态友链、说说等特色页面，性能大幅优化，后续将持续完善站点功能与体验。</description><pubDate>Tue, 30 Jun 2026 00:00:00 GMT</pubDate></item><item><title>各位好久不见 | 关于后期的规划</title><link>https://www.xscnet.cn/posts/p3920260627/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3920260627/</guid><description>热衷于静态博客架构优化与前端技术实践，深耕站点重构、性能调优与框架迭代工作，致力于打磨轻量化、高适配的个人博客站点。同时记录高考后的成长感悟与人生规划，在技术深耕与生活成长中持续沉淀、不断前行。</description><pubDate>Sat, 27 Jun 2026 00:00:00 GMT</pubDate></item><item><title>AI导致的乱象以及个人形象与大家的初次见面</title><link>https://www.xscnet.cn/posts/p3820260502/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3820260502/</guid><description>五一假期临近高考，分享日常备考与学习感悟，结合瑞文推理测验实测发现过度依赖AI会造成推理能力下滑，从独立思考、主观能动性、专注力、认知卸载四方面剖析AI滥用带来的大脑与认知乱象，引用多份权威资料佐证危害，谈及算法碎片化信息侵蚀思维，同时公布个人虚拟形象流星同学正式登场，博客小幅优化细节Bug，立下戒过度依赖AI、回归自主思考学习的决心。</description><pubDate>Sat, 02 May 2026 00:00:00 GMT</pubDate></item><item><title>游戏体验：《PRAGMATA》(识质存在)</title><link>https://www.xscnet.cn/posts/p3720260420/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3720260420/</guid><description>卡普空2026年科幻新作《PRAGMATA》（识质存在）实测体验！IGN 8分、Metacritic 86分好评加持，以月球基地为舞台，讲述人类调查员休与仿生女童戴安娜的羁绊之旅。独特的“黑客+射击”战斗机制、细腻的角色塑造、极佳的优化表现，打破单机游戏审美疲劳，成为2026年迄今为止最让人眼前一亮的科幻动作冒险佳作。</description><pubDate>Mon, 20 Apr 2026 00:00:00 GMT</pubDate></item><item><title>轻量化个人主页</title><link>https://www.xscnet.cn/posts/p3620260418/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3620260418/</guid><description>本文作者为打造个性化个人主页，开发了开源项目 minimal-homepage，核心特色是轻量化设计、高度集成配置 —— 无需修改多个文件，仅通过 main.config.js 即可完成所有设置，还支持显色模式切换、Github 信息对接、RSS 源自定义等实用功能，适配个人主页的简洁需求。项目部署极为便捷，提供 npm 和 git 两种简单安装方式，复制粘贴命令即可完成操作，后续可轻松部署至 Github Pages、Vercel 等平台，步骤简单易懂。这是作者首个正式开源项目，解决了市面模板臃肿、配置繁琐的痛点，欢迎用户使用并提出建议。</description><pubDate>Sat, 18 Apr 2026 00:00:00 GMT</pubDate></item><item><title>使用Hexo搭建自己的博客</title><link>https://www.xscnet.cn/posts/p3520260403/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3520260403/</guid><description>本文为新手保姆级 Hexo 博客搭建教程，详细记录 NodeJS、Git、Hexo 框架的安装，Stellar 主题配置，以及 Artalk 评论、Lsky 图床部署和友链页面搭建，助力新手快速上手，加入博客圈，用文字留存热爱。</description><pubDate>Fri, 03 Apr 2026 00:00:00 GMT</pubDate></item><item><title>博客源站IP泄露的两种主要方式与防护指南</title><link>https://www.xscnet.cn/posts/p3420260329/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3420260329/</guid><description>源站IP泄露是博客安全中常见但容易被忽视的问题。本文结合实际案例，详细分析了邮件推送和TLS/SSL证书两种泄露源站IP的典型途径，包括其原理、成因以及具体排查方式。同时，文章提供了使用阿里云邮件推送服务、关闭源站Web端口、配置默认假证书等实用的防护方案，帮助博主在不影响正常功能的前提下有效隐藏源站IP，提升网站整体安全性。</description><pubDate>Sun, 29 Mar 2026 00:00:00 GMT</pubDate></item><item><title>三月小记：春雨、体检与博客二三事</title><link>https://www.xscnet.cn/posts/p3320260325/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3320260325/</guid><description>等一场姗姗来迟的东北春日，记一次十八岁的体检，再为博客添一处安放琐碎的角落——三月，在平凡里悄悄生长。</description><pubDate>Wed, 25 Mar 2026 00:00:00 GMT</pubDate></item><item><title>近期随笔：对生活的总结和对博客主题的探索</title><link>https://www.xscnet.cn/posts/p3220260307/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3220260307/</guid><description>周六暂别学业压力，反思游戏从童年消遣变为现实逃避的历程。随着高考临近，决定淡出游戏圈。利用闲暇时间，将博客框架由Valaxy迁移至Hexo，并深入研究Hexo的优秀生态，特别是基于GitHub Actions的自动化友链管理方案。在折腾技术中找回快乐，实现游戏“祛魅”。</description><pubDate>Sat, 07 Mar 2026 00:00:00 GMT</pubDate></item><item><title>博客框架更新！</title><link>https://www.xscnet.cn/posts/p3120260303/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3120260303/</guid><description>站长将博客从Valaxy迁移至Hexo，并利用GitHub Actions实现了从代码推送、自动构建到阿里云服务器部署的全自动化流水线，确保了博客的稳定运行</description><pubDate>Wed, 04 Mar 2026 00:00:00 GMT</pubDate></item><item><title>各位，好久不见!</title><link>https://www.xscnet.cn/posts/p3020260228/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3020260228/</guid><description>站在十八岁的门槛上，在东北萧瑟的冬日里，记录下关于高考、成长与博客的点滴。从代码小白到坚持探索的站长，变的是身份与职责，不变的是对生活的热爱。虽有短暂告别，但未来重构计划已在路上。</description><pubDate>Sat, 28 Feb 2026 00:00:00 GMT</pubDate></item><item><title>致歉通知</title><link>https://www.xscnet.cn/posts/p2920251025/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p2920251025/</guid><description>这是一封致歉信：作为一名高三学生，因学业原因不得不暂时告别博客圈。我承诺在2026年6月高考后回归，届时将恢复内容更新。感谢各位的理解与支持！</description><pubDate>Sat, 25 Oct 2025 00:00:00 GMT</pubDate></item><item><title>最近的小事</title><link>https://www.xscnet.cn/posts/p2820250829/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p2820250829/</guid><description>阔别一月回归，分享近况：陪伴家人、沉迷科幻小说《二级文明有二向箔很合理吧》与游戏《戴森球计划》，并自主开发了存档同步工具解决游戏痛点。</description><pubDate>Fri, 29 Aug 2025 09:00:00 GMT</pubDate></item><item><title>站点更新！CDN优化！腾讯EO白嫖经历</title><link>https://www.xscnet.cn/posts/p2620250716/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p2620250716/</guid><description>这篇文章主要讲了博主半个月来因筹划优化计划导致博客访问异常的情况，随后介绍了博客的两项更新：更换自建图床解决原图床流量异常引发的 SSL 安全问题，以及借助技术支持在后端完成评论区定期备份设置。还分享了接入腾讯云 EdgeOne 加速平台的经历，包括三种激活码获取方式、实操体验及跨厂商对接的 SSL 问题解决方案，最后总结 EO 对静态博客友好，能降低建站成本</description><pubDate>Wed, 16 Jul 2025 14:32:00 GMT</pubDate></item><item><title>被迫购新的充电宝</title><link>https://www.xscnet.cn/posts/p27202507162/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p27202507162/</guid><description>这篇文章主要讲了作者因民航局新规（6 月 28 日起禁止携带无 3C 标识、标识不清晰等充电宝登机），且自己的充电宝均为 2024 年 8 月前购买、无 3C 标识，被迫购买了酷态科新充电宝，并介绍了该充电宝的特点；同时还提及罗马仕充电宝因电芯质量等问题频发安全事故，分析了当前充电宝市场因恶性竞争压缩成本导致产品存在安全隐患的现状</description><pubDate>Wed, 16 Jul 2025 09:05:00 GMT</pubDate></item><item><title>音乐推荐:莫愁乡</title><link>https://www.xscnet.cn/posts/p2520250703/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p2520250703/</guid><description>最近刷视频刷到了亞細亞曠世奇才唱的这首莫愁乡，听了之后才发现是一位新晋说唱歌手唱的好歌，本篇主要是为分享歌曲并作简单评价，但我的评价仅作参考使用，具体还需要看自己听过之后的感受啦</description><pubDate>Thu, 03 Jul 2025 00:00:00 GMT</pubDate></item><item><title>2025六月小结:长时间的等待</title><link>https://www.xscnet.cn/posts/p2420250629/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p2420250629/</guid><description>先和各位博友站长们道个歉,失踪了这么长时间还没和大家互访</description><pubDate>Sun, 29 Jun 2025 00:00:00 GMT</pubDate></item><item><title>2025五月小结:音乐节初体验</title><link>https://www.xscnet.cn/posts/p2320250524/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p2320250524/</guid><description>&gt;## 📅 五月总结  
+
+这次的经历让我心情很是愉悦呢~  
+**2025年5月24日 -- 心情晴**  
+&lt;meting-js
+	server=&quot;netease&quot;
+	type=&quot;song&quot;
+	id=&quot;1974443815&quot;
+  mode=&quot;circulation&quot;&gt;
+&lt;/meting-js&gt;
+
+&gt;### 🎵 </description><pubDate>Sat, 24 May 2025 00:00:00 GMT</pubDate></item><item><title>彼方的她-Aliya</title><link>https://www.xscnet.cn/posts/p2220250518/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p2220250518/</guid><description>Aliya是理科生的理想型!玩家并非扮演游戏角色，而是真实的参与到游戏中，而且游戏时间与现实时间同步，所以会给人有一种很强的沉浸感，这是前所未有的。同时，也有很多细节，比如说心率，不同的情况下Aliya心率都会变化，将程序挂后台Aliya给你发信息你的Windows还会弹窗推送给你，仿佛这真的是一个活生生的人一样。</description><pubDate>Sun, 18 May 2025 00:00:00 GMT</pubDate></item><item><title>Believe</title><link>https://www.xscnet.cn/posts/p2120250511/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p2120250511/</guid><description>这篇文章分享了一首歌曲《Believe》以及两部关于2018年泰国洞穴救援事件的影视作品——纪录片《泰国洞穴救援》和剧情片《十三条命》。作者被洞穴潜水这一极限运动吸引，感慨于救援人员的英勇精神，并立下未来尝试洞穴潜水的目标，表达了对生命的热爱与冒险的向往。</description><pubDate>Sun, 11 May 2025 00:00:00 GMT</pubDate></item><item><title>2025四月小结</title><link>https://www.xscnet.cn/posts/p1920250501/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p1920250501/</guid><description>更新博客、学习调整、做了两个小工具、准备换新域名。</description><pubDate>Thu, 01 May 2025 19:00:00 GMT</pubDate></item><item><title>下载抖音表情包</title><link>https://www.xscnet.cn/posts/P2020250501/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/P2020250501/</guid><description>一款基于 Python 的自动化抓包下载工具，用于批量获取抖音私信表情包（支持 .jpg、.jpeg、.webp、.png、.gif 格式）。自动抓包 批量下载 格式兼容. 总结：工具通过自动化抓包简化了抖音表情包的获取流程，适合技术研究，但需注意合法使用</description><pubDate>Thu, 01 May 2025 08:00:00 GMT</pubDate></item><item><title>网易云VIP歌曲解析</title><link>https://www.xscnet.cn/posts/p1820250427/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p1820250427/</guid><description>网易云VIP歌曲解析，GitHub仓库地址:https://github.com/mete0rxsc/NetEase-Cloud-VIP-Song-Analysis，请注重版权意识，此软件仅作为学习使用</description><pubDate>Sun, 27 Apr 2025 21:36:36 GMT</pubDate></item><item><title>好用的开源项目</title><link>https://www.xscnet.cn/posts/p1720250426Links/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p1720250426Links/</guid><description>总结了我感觉玄离199视频中提到的好用的开源项目</description><pubDate>Sat, 26 Apr 2025 00:00:00 GMT</pubDate></item><item><title>我爱科幻</title><link>https://www.xscnet.cn/posts/p1620250424/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p1620250424/</guid><description>科幻YYDS</description><pubDate>Thu, 24 Apr 2025 00:00:00 GMT</pubDate></item><item><title>(五)</title><link>https://www.xscnet.cn/posts/p1520250423/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p1520250423/</guid><description>四月中旬的小总结</description><pubDate>Wed, 23 Apr 2025 00:00:00 GMT</pubDate></item><item><title>(四)</title><link>https://www.xscnet.cn/posts/p1420250415/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p1420250415/</guid><description>::: zh-CN
 
 许久不见各位  
 报个平安  
 最近安然无恙  
 ### 最近的项目
-最近开发了几个适配这个Yun主题的</description><pubDate>Tue, 15 Apr 2025 00:00:00 GMT</pubDate></item><item><title>Valaxy Yun External Link</title><link>https://www.xscnet.cn/posts/p1320250414/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p1320250414/</guid><description>   
-            
-                               
-                
-                   
-              
-     
-      
-   
-::: zh-CN
+最近开发了几个适配这个Yun主题的Vue插件  
+
+[点我查看valaxy-yun-external-link的Github仓库](https://github.com/mete0rxsc/valaxy-yun-external</description><pubDate>Tue, 15 Apr 2025 00:00:00 GMT</pubDate></item><item><title>Valaxy Yun External Link</title><link>https://www.xscnet.cn/posts/p1320250414/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p1320250414/</guid><description>::: zh-CN
 
 ## 视频教程
-&lt;iframe src=&quot;//player.b</description><pubDate>Mon, 14 Apr 2025 00:00:00 GMT</pubDate></item><item><title>Lullaby</title><link>https://www.xscnet.cn/posts/p1220250406/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p1220250406/</guid><description>   
-            
-              
-                         
-                            
-              
-     
-        
-   
-&lt;audio controls&gt;
-&lt;source src=&quot;/audio/En</description><pubDate>Sun, 06 Apr 2025 23:47:08 GMT</pubDate></item><item><title>使用Valaxy搭建自己的博客</title><link>https://www.xscnet.cn/posts/p1120250403/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p1120250403/</guid><description>   
-            
-                      
-                
-                   
-                                                                         
-         </description><pubDate>Thu, 03 Apr 2025 00:00:00 GMT</pubDate></item><item><title>《三月雪笺》</title><link>https://www.xscnet.cn/posts/p10pm220250329/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p10pm220250329/</guid><description>   
-            
-             
-                
-                   
-                
-     
-        
-   
-::: zh-CN
+&lt;iframe src=&quot;//player.bilibili.com/player.html?114336626379312&amp;bvid=BV1a2o7Y9E2V&amp;cid=29414262604&amp;p=1&amp;high_quality=1&amp;danmaku=1&amp;autoplay=0&quot; scr</description><pubDate>Mon, 14 Apr 2025 00:00:00 GMT</pubDate></item><item><title>Lullaby</title><link>https://www.xscnet.cn/posts/p1220250406/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p1220250406/</guid><description>&lt;audio controls&gt;
+&lt;source src=&quot;/audio/Enzalla - Lullaby.wav&quot; type=&quot;audio/mpeg&quot;&gt;
+您的浏览器不支持音频元素。
+&lt;/audio&gt;
+因为这首歌是VIP，不支持完整播放，所以我直接上传到本地了
+&lt;meting-js
+	server=&quot;netease&quot;</description><pubDate>Sun, 06 Apr 2025 23:47:08 GMT</pubDate></item><item><title>使用Valaxy搭建自己的博客</title><link>https://www.xscnet.cn/posts/p1120250403/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p1120250403/</guid><description>::: zh-CN
+&gt;## 视频教程：
+&lt;iframe src=&quot;//player.bilibili.com/player.html?114274684897948&amp;bvid=BV1FiZUYdEcV&amp;cid=29220537022&amp;p=1&amp;high_quality=1&amp;danmaku=1&amp;autoplay=0&quot; sc</description><pubDate>Thu, 03 Apr 2025 00:00:00 GMT</pubDate></item><item><title>《三月雪笺》</title><link>https://www.xscnet.cn/posts/p10pm220250329/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p10pm220250329/</guid><description>::: zh-CN
 
 《三月雪笺》
 
 银绦漫舞锁春申，  
 玉盏噙香待故人。  
 松影量风拂旧雪，  
-冰棱垂泪</description><pubDate>Sat, 29 Mar 2025 00:00:00 GMT</pubDate></item><item><title>《茧》</title><link>https://www.xscnet.cn/posts/p8pm120250329/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p8pm120250329/</guid><description>   
-            
-          
-                
-                   
-                
-     
-        
-   
-::: zh-CN
+冰棱垂泪绣新痕。  
+:::
+
+::: en
+
+Chinese poetry does not provide English translation, please be aware
+
+::: </description><pubDate>Sat, 29 Mar 2025 00:00:00 GMT</pubDate></item><item><title>《茧》</title><link>https://www.xscnet.cn/posts/p8pm120250329/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p8pm120250329/</guid><description>::: zh-CN
 
 《茧》
 
@@ -82,77 +51,78 @@
 年轮的褶皱  
 
 我等你舌尖的盐  
-在暮色</description><pubDate>Sat, 29 Mar 2025 00:00:00 GMT</pubDate></item><item><title>2025三月小结</title><link>https://www.xscnet.cn/posts/p9m120250329/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p9m120250329/</guid><description>   
-            
-               
-                
-                   
-                                                                         
-               
-</description><pubDate>Sat, 29 Mar 2025 00:00:00 GMT</pubDate></item><item><title>(三)</title><link>https://www.xscnet.cn/posts/p720250327/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p720250327/</guid><description>   
-            
-          
-                
-                   
-                                                                        
-              
-     
- </description><pubDate>Thu, 27 Mar 2025 00:00:00 GMT</pubDate></item><item><title>（二）</title><link>https://www.xscnet.cn/posts/p620250325/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p620250325/</guid><description>   
-            
-          
-                
-                   
-              
-                                                                         
-     
-</description><pubDate>Tue, 25 Mar 2025 00:00:00 GMT</pubDate></item><item><title>（一）</title><link>https://www.xscnet.cn/posts/p520250322/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p520250322/</guid><description>   
-            
-          
-                
-                   
-              
-     
-      
-   
-::: zh-CN
+在暮色结晶  
+等二十四封信  
+被潮声蛀空  
+月光正拆解  
+每一粒沙的堤岸  
+
+黄昏在指缝崩塌七次之后  
+我们的名字  
+仍卡在春天的喉间  
+发不出芽  
+
+:::
+
+::: en
+
+Chines</description><pubDate>Sat, 29 Mar 2025 00:00:00 GMT</pubDate></item><item><title>2025三月小结</title><link>https://www.xscnet.cn/posts/p9m120250329/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p9m120250329/</guid><description>::: zh-CN
+
+---
+
+# 2025年3月29日 春雪记事  
+三月的最后一周，空气里依然裹着冬天的尾巴。教室窗台上的冰凌悄悄生长，折射着北方少年眼中的奇妙三月。  
+这本该是柳枝抽芽的时节，此刻窗外却在上演另一番景象：  
+![1](https://imgse.koxiuqiu.cc/imgse/u/23/2</description><pubDate>Sat, 29 Mar 2025 00:00:00 GMT</pubDate></item><item><title>(三)</title><link>https://www.xscnet.cn/posts/p720250327/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p720250327/</guid><description>::: zh-CN
+
+推荐搭配此音乐食用，风味更佳
+&lt;meting-js
+	server=&quot;netease&quot;
+	type=&quot;song&quot;
+	id=&quot;1974443814&quot;
+  mode=&quot;circulation&quot;&gt;
+&lt;/meting-js&gt;
+
+✦
+
+# 2025/3/27 ｜ 📅 开心の日
+🕊️ 情绪温度：36.5°</description><pubDate>Thu, 27 Mar 2025 00:00:00 GMT</pubDate></item><item><title>（二）</title><link>https://www.xscnet.cn/posts/p620250325/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p620250325/</guid><description>::: zh-CN
+
+推荐搭配此音乐食用，风味更佳
+&lt;meting-js
+	server=&quot;netease&quot;
+	type=&quot;song&quot;
+	id=&quot;1992712131&quot;
+  mode=&quot;circulation&quot;&gt;
+&lt;/meting-js&gt;
+
+## 2025/03/26 东北春雪絮语：一个高二学生的建站手记  
+
+###</description><pubDate>Tue, 25 Mar 2025 00:00:00 GMT</pubDate></item><item><title>（一）</title><link>https://www.xscnet.cn/posts/p520250322/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p520250322/</guid><description>::: zh-CN
 ## 高二下学期开学一个月了
-一转眼，高二下学习已经开学一个月了，我想象中的那种繁忙没有出现，只是学习进度</description><pubDate>Sat, 22 Mar 2025 00:00:00 GMT</pubDate></item><item><title>我对于个人博客的看法</title><link>https://www.xscnet.cn/posts/p4/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p4/</guid><description>   
-            
-                 
-                
-                   
-              
-     
-      
-   
-::: zh-CN
+一转眼，高二下学习已经开学一个月了，我想象中的那种繁忙没有出现，只是学习进度在加快  
+我甚至还有闲心上课摸鱼（bushi  
+其实我打小对学习我自己不感兴趣的知识是犯抵触心理的，但是我现在似乎可以听进去一点了！这是一个进步呢
+
+## 未来
+最近在和同学唠嗑的过程中谈到</description><pubDate>Sat, 22 Mar 2025 00:00:00 GMT</pubDate></item><item><title>我对于个人博客的看法</title><link>https://www.xscnet.cn/posts/p4/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p4/</guid><description>::: zh-CN
 
 ## 浅谈我对个人博客的看法
-### 宇宙级免责声明：我说的内容仅表达我自己的看法，我尊重</description><pubDate>Sun, 22 Dec 2024 00:00:00 GMT</pubDate></item><item><title>博客竣工!</title><link>https://www.xscnet.cn/posts/p3/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3/</guid><description>   
-            
-            
-                
-                   
-              
-     
-      
-      
-      
-   
-::: zh-CN
+### 宇宙级免责声明：我说的内容仅表达我自己的看法，我尊重任何人的劳动成果，尊重任何人的选择
+我认为一个人的个人博客，最重要的是记录自己的日常吧，感觉过多的进行技术类分享，不会有特别多人在博客里过多的浏览文章，反而是浏览完自己需要的文章之后就退出了  
+对我来说，我</description><pubDate>Sun, 22 Dec 2024 00:00:00 GMT</pubDate></item><item><title>博客竣工!</title><link>https://www.xscnet.cn/posts/p3/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p3/</guid><description>::: zh-CN
 
 ## 我的博客基本竣工啦！
-北京时间23点04分，我刚刚上完外教课，有点</description><pubDate>Tue, 18 Jun 2024 00:00:00 GMT</pubDate></item><item><title>重大更新!我的博客全面换为Valaxy框架!</title><link>https://www.xscnet.cn/posts/p2/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p2/</guid><description>   
-            
-                             
-                
-                   
-              
-     
-      
-   
-::: zh-CN
+北京时间23点04分，我刚刚上完外教课，有点累，但是还是掩饰不住我内心的喜悦
+虽然最近一些烦心的事情比较多，但是在这一刻终究还是开心的
+最近在学校里好多烦心事
+
+## 学校的烦心事
+1. 这个破学校每天要求我们穿那个丑的要死的校服，每周一还要检查我们的头发是否合格，不合</description><pubDate>Tue, 18 Jun 2024 00:00:00 GMT</pubDate></item><item><title>重大更新!我的博客全面换为Valaxy框架!</title><link>https://www.xscnet.cn/posts/p2/</link><guid isPermaLink="true">https://www.xscnet.cn/posts/p2/</guid><description>::: zh-CN
 
 ## 重大更新!我的博客全面换为Valaxy框架!
 
-##### </description><pubDate>Fri, 16 Feb 2024 00:00:00 GMT</pubDate></item></channel></rss>
+##### Q1:原先的博客是不能访问了吗？
+A1:当然不是！我在这P个超链接[点我可以直接回到原先的博客，但不会继续更新](https://blog.xscnas.top:9088)
+
+##### Q2:不都是博客吗，费这么大劲，有什么区别？</description><pubDate>Fri, 16 Feb 2024 00:00:00 GMT</pubDate></item></channel></rss>

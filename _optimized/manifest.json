@@ -1,0 +1,884 @@
+{
+  "version": 1,
+  "generatedAt": "2026-07-18T18:09:57.484Z",
+  "images": {
+    "https://img.xscnet.cn//i/2026/06/28/6a40e72d6a01e.jpg": {
+      "original": "https://img.xscnet.cn//i/2026/06/28/6a40e72d6a01e.jpg",
+      "roles": [
+        "avatar"
+      ],
+      "width": 2048,
+      "height": 2048,
+      "variants": [
+        {
+          "src": "/_optimized/c30e7f74ab68636a-48w.webp",
+          "width": 48,
+          "height": 48,
+          "bytes": 1028
+        },
+        {
+          "src": "/_optimized/b673e42aa594a6bb-96w.webp",
+          "width": 96,
+          "height": 96,
+          "bytes": 2956
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/04/15/69df23fa386ef.png": {
+      "original": "https://img.xscnet.cn//i/2026/04/15/69df23fa386ef.png",
+      "roles": [
+        "avatar"
+      ],
+      "width": 1024,
+      "height": 1024,
+      "variants": [
+        {
+          "src": "/_optimized/ed360653312b3448-48w.webp",
+          "width": 48,
+          "height": 48,
+          "bytes": 1738
+        },
+        {
+          "src": "/_optimized/8e1a6faf6c8a2217-96w.webp",
+          "width": 96,
+          "height": 96,
+          "bytes": 4264
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/06/28/6a41079e1eda1.png": {
+      "original": "https://img.xscnet.cn//i/2026/06/28/6a41079e1eda1.png",
+      "roles": [
+        "avatar"
+      ],
+      "width": 2048,
+      "height": 2048,
+      "variants": [
+        {
+          "src": "/_optimized/fdee6965b79dbe14-48w.webp",
+          "width": 48,
+          "height": 48,
+          "bytes": 806
+        },
+        {
+          "src": "/_optimized/85eb9c78ebeaf1fd-96w.webp",
+          "width": 96,
+          "height": 96,
+          "bytes": 2278
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/06/28/6a40fb8314257.png": {
+      "original": "https://img.xscnet.cn//i/2026/06/28/6a40fb8314257.png",
+      "roles": [
+        "splash"
+      ],
+      "width": 1535,
+      "height": 2732,
+      "variants": [
+        {
+          "src": "/_optimized/47f7818c6593c9b1-360w.webp",
+          "width": 360,
+          "height": 641,
+          "bytes": 40736
+        },
+        {
+          "src": "/_optimized/c6946b11e7d934ea-480w.webp",
+          "width": 480,
+          "height": 854,
+          "bytes": 60222
+        },
+        {
+          "src": "/_optimized/d1325d79239013b6-780w.webp",
+          "width": 780,
+          "height": 1388,
+          "bytes": 112878
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/06/28/6a41010fa0b70.png": {
+      "original": "https://img.xscnet.cn//i/2026/06/28/6a41010fa0b70.png",
+      "roles": [
+        "side"
+      ],
+      "width": 1535,
+      "height": 2732,
+      "variants": [
+        {
+          "src": "/_optimized/23ca163efcb61d67-160w.webp",
+          "width": 160,
+          "height": 285,
+          "bytes": 13150
+        },
+        {
+          "src": "/_optimized/1301a6121d1e1841-240w.webp",
+          "width": 240,
+          "height": 427,
+          "bytes": 22708
+        },
+        {
+          "src": "/_optimized/05f37343e2c164b1-480w.webp",
+          "width": 480,
+          "height": 854,
+          "bytes": 57784
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/06/28/6a411996d7857.png": {
+      "original": "https://img.xscnet.cn//i/2026/06/28/6a411996d7857.png",
+      "roles": [
+        "palette"
+      ],
+      "width": 1535,
+      "height": 2732,
+      "variants": [
+        {
+          "src": "/_optimized/a9d407c57f859fb3-96w.webp",
+          "width": 96,
+          "height": 171,
+          "bytes": 6016
+        },
+        {
+          "src": "/_optimized/d69d2252a4e11667-160w.webp",
+          "width": 160,
+          "height": 285,
+          "bytes": 11948
+        },
+        {
+          "src": "/_optimized/5a04ab71a62f954a-240w.webp",
+          "width": 240,
+          "height": 427,
+          "bytes": 20728
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/06/27/6a3f88841dc57.png": {
+      "original": "https://img.xscnet.cn//i/2026/06/27/6a3f88841dc57.png",
+      "roles": [
+        "background"
+      ],
+      "width": 2732,
+      "height": 1534,
+      "variants": [
+        {
+          "src": "/_optimized/ae5bd480ba1e52ac-768w.webp",
+          "width": 768,
+          "height": 431,
+          "bytes": 58052
+        },
+        {
+          "src": "/_optimized/d296333035b20735-1440w.webp",
+          "width": 1440,
+          "height": 809,
+          "bytes": 132808
+        },
+        {
+          "src": "/_optimized/b00a314582410ca2-1920w.webp",
+          "width": 1920,
+          "height": 1078,
+          "bytes": 183584
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/06/28/6a40fd6561a59.png": {
+      "original": "https://img.xscnet.cn//i/2026/06/28/6a40fd6561a59.png",
+      "roles": [
+        "background"
+      ],
+      "width": 2732,
+      "height": 1534,
+      "variants": [
+        {
+          "src": "/_optimized/9181e8d73f39fb1c-768w.webp",
+          "width": 768,
+          "height": 431,
+          "bytes": 27858
+        },
+        {
+          "src": "/_optimized/383a2f115e59e7e5-1440w.webp",
+          "width": 1440,
+          "height": 809,
+          "bytes": 69936
+        },
+        {
+          "src": "/_optimized/6fca89b3d4813209-1920w.webp",
+          "width": 1920,
+          "height": 1078,
+          "bytes": 101982
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/06/30/6a42a16d2abd6.png": {
+      "original": "https://img.xscnet.cn//i/2026/06/30/6a42a16d2abd6.png",
+      "roles": [
+        "project"
+      ],
+      "width": 1672,
+      "height": 941,
+      "variants": [
+        {
+          "src": "/_optimized/9ec40d26feb13d09-480w.webp",
+          "width": 480,
+          "height": 270,
+          "bytes": 18462
+        },
+        {
+          "src": "/_optimized/56d9bdc525177481-900w.webp",
+          "width": 900,
+          "height": 507,
+          "bytes": 49676
+        },
+        {
+          "src": "/_optimized/e911c30c6a4658b6-1440w.webp",
+          "width": 1440,
+          "height": 810,
+          "bytes": 98520
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/06/30/6a42a5057889a.png": {
+      "original": "https://img.xscnet.cn//i/2026/06/30/6a42a5057889a.png",
+      "roles": [
+        "project"
+      ],
+      "width": 1672,
+      "height": 941,
+      "variants": [
+        {
+          "src": "/_optimized/834195a1d4423480-480w.webp",
+          "width": 480,
+          "height": 270,
+          "bytes": 32730
+        },
+        {
+          "src": "/_optimized/3e70018e258c8e3c-900w.webp",
+          "width": 900,
+          "height": 507,
+          "bytes": 84380
+        },
+        {
+          "src": "/_optimized/f80c35b0a9abef26-1440w.webp",
+          "width": 1440,
+          "height": 810,
+          "bytes": 161210
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2025/10/30/69035cbc8992a.webp": {
+      "original": "https://img.xscnet.cn//i/2025/10/30/69035cbc8992a.webp",
+      "roles": [
+        "cover"
+      ],
+      "width": 1000,
+      "height": 500,
+      "variants": [
+        {
+          "src": "/_optimized/cef759addd51a72b-420w.webp",
+          "width": 420,
+          "height": 210,
+          "bytes": 7052
+        },
+        {
+          "src": "/_optimized/445d5065b12666e3-768w.webp",
+          "width": 768,
+          "height": 384,
+          "bytes": 12722
+        },
+        {
+          "src": "/_optimized/5de22e2bb284951a-1000w.webp",
+          "width": 1000,
+          "height": 500,
+          "bytes": 18062
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2025/10/30/69035cbe1fbe9.webp": {
+      "original": "https://img.xscnet.cn//i/2025/10/30/69035cbe1fbe9.webp",
+      "roles": [
+        "cover"
+      ],
+      "width": 1000,
+      "height": 500,
+      "variants": [
+        {
+          "src": "/_optimized/385749e5670b6a74-420w.webp",
+          "width": 420,
+          "height": 210,
+          "bytes": 9794
+        },
+        {
+          "src": "/_optimized/a620b382f9edb89d-768w.webp",
+          "width": 768,
+          "height": 384,
+          "bytes": 17842
+        },
+        {
+          "src": "/_optimized/a845faa82b9ed975-1000w.webp",
+          "width": 1000,
+          "height": 500,
+          "bytes": 25066
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2025/10/30/69035a96c5cd9.webp": {
+      "original": "https://img.xscnet.cn//i/2025/10/30/69035a96c5cd9.webp",
+      "roles": [
+        "cover"
+      ],
+      "width": 1000,
+      "height": 500,
+      "variants": [
+        {
+          "src": "/_optimized/95f4deeda99de229-420w.webp",
+          "width": 420,
+          "height": 210,
+          "bytes": 8124
+        },
+        {
+          "src": "/_optimized/61230fa492656ea7-768w.webp",
+          "width": 768,
+          "height": 384,
+          "bytes": 14728
+        },
+        {
+          "src": "/_optimized/4671497e6262226e-1000w.webp",
+          "width": 1000,
+          "height": 500,
+          "bytes": 20670
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2025/10/30/69035cbe1c946.webp": {
+      "original": "https://img.xscnet.cn//i/2025/10/30/69035cbe1c946.webp",
+      "roles": [
+        "cover"
+      ],
+      "width": 1000,
+      "height": 500,
+      "variants": [
+        {
+          "src": "/_optimized/6ae0e1905eaba5e4-420w.webp",
+          "width": 420,
+          "height": 210,
+          "bytes": 12450
+        },
+        {
+          "src": "/_optimized/cdf4363d084bbd40-768w.webp",
+          "width": 768,
+          "height": 384,
+          "bytes": 22502
+        },
+        {
+          "src": "/_optimized/54b10d7db9d37a91-1000w.webp",
+          "width": 1000,
+          "height": 500,
+          "bytes": 32382
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2025/10/30/69035cbcbbc20.webp": {
+      "original": "https://img.xscnet.cn//i/2025/10/30/69035cbcbbc20.webp",
+      "roles": [
+        "cover"
+      ],
+      "width": 1000,
+      "height": 500,
+      "variants": [
+        {
+          "src": "/_optimized/998310cd099c45f5-420w.webp",
+          "width": 420,
+          "height": 210,
+          "bytes": 6256
+        },
+        {
+          "src": "/_optimized/5a0d094ab94e1413-768w.webp",
+          "width": 768,
+          "height": 384,
+          "bytes": 11500
+        },
+        {
+          "src": "/_optimized/fcc806db57c4d09b-1000w.webp",
+          "width": 1000,
+          "height": 500,
+          "bytes": 15936
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2025/10/30/69035cbd381f0.webp": {
+      "original": "https://img.xscnet.cn//i/2025/10/30/69035cbd381f0.webp",
+      "roles": [
+        "cover"
+      ],
+      "width": 1000,
+      "height": 500,
+      "variants": [
+        {
+          "src": "/_optimized/2e220e2df1c00cd1-420w.webp",
+          "width": 420,
+          "height": 210,
+          "bytes": 9716
+        },
+        {
+          "src": "/_optimized/2592325f5319313e-768w.webp",
+          "width": 768,
+          "height": 384,
+          "bytes": 17162
+        },
+        {
+          "src": "/_optimized/bb9b99ab4b65a21b-1000w.webp",
+          "width": 1000,
+          "height": 500,
+          "bytes": 23746
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2025/10/30/69035cbd0cc44.webp": {
+      "original": "https://img.xscnet.cn//i/2025/10/30/69035cbd0cc44.webp",
+      "roles": [
+        "cover"
+      ],
+      "width": 1000,
+      "height": 500,
+      "variants": [
+        {
+          "src": "/_optimized/b849044558c8a575-420w.webp",
+          "width": 420,
+          "height": 210,
+          "bytes": 8678
+        },
+        {
+          "src": "/_optimized/919797cfb89fc944-768w.webp",
+          "width": 768,
+          "height": 384,
+          "bytes": 14734
+        },
+        {
+          "src": "/_optimized/58e80a6463ba9c0b-1000w.webp",
+          "width": 1000,
+          "height": 500,
+          "bytes": 19806
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2025/08/29/68b16416609aa.webp": {
+      "original": "https://img.xscnet.cn//i/2025/08/29/68b16416609aa.webp",
+      "roles": [
+        "cover"
+      ],
+      "width": 1000,
+      "height": 500,
+      "variants": [
+        {
+          "src": "/_optimized/545892fc24ba777c-420w.webp",
+          "width": 420,
+          "height": 210,
+          "bytes": 7082
+        },
+        {
+          "src": "/_optimized/0a230bdc0760d436-768w.webp",
+          "width": 768,
+          "height": 384,
+          "bytes": 13110
+        },
+        {
+          "src": "/_optimized/0ef0c29ab8807370-1000w.webp",
+          "width": 1000,
+          "height": 500,
+          "bytes": 18272
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2025/10/30/69035a9c5f86c.webp": {
+      "original": "https://img.xscnet.cn//i/2025/10/30/69035a9c5f86c.webp",
+      "roles": [
+        "cover"
+      ],
+      "width": 1000,
+      "height": 500,
+      "variants": [
+        {
+          "src": "/_optimized/26fbf0d4041a377a-420w.webp",
+          "width": 420,
+          "height": 210,
+          "bytes": 10618
+        },
+        {
+          "src": "/_optimized/94b5255368a42811-768w.webp",
+          "width": 768,
+          "height": 384,
+          "bytes": 30416
+        },
+        {
+          "src": "/_optimized/5090ab59f2e65b13-1000w.webp",
+          "width": 1000,
+          "height": 500,
+          "bytes": 79588
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/03/01/69a3159da4717.png": {
+      "original": "https://img.xscnet.cn//i/2026/03/01/69a3159da4717.png",
+      "roles": [
+        "cover"
+      ],
+      "width": 1376,
+      "height": 768,
+      "variants": [
+        {
+          "src": "/_optimized/9c32cfe7baa7e3a5-420w.webp",
+          "width": 420,
+          "height": 234,
+          "bytes": 11346
+        },
+        {
+          "src": "/_optimized/9660c72e197b88fa-768w.webp",
+          "width": 768,
+          "height": 429,
+          "bytes": 27856
+        },
+        {
+          "src": "/_optimized/aeaab323c914b265-1200w.webp",
+          "width": 1200,
+          "height": 670,
+          "bytes": 50768
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/03/04/69a706d89aac6.webp": {
+      "original": "https://img.xscnet.cn//i/2026/03/04/69a706d89aac6.webp",
+      "roles": [
+        "cover"
+      ],
+      "width": 2730,
+      "height": 1535,
+      "variants": [
+        {
+          "src": "/_optimized/f327093a9d9020fa-420w.webp",
+          "width": 420,
+          "height": 236,
+          "bytes": 3910
+        },
+        {
+          "src": "/_optimized/5c7c812a4e2ac22e-768w.webp",
+          "width": 768,
+          "height": 432,
+          "bytes": 8868
+        },
+        {
+          "src": "/_optimized/cd7869f9777fa05e-1200w.webp",
+          "width": 1200,
+          "height": 675,
+          "bytes": 16222
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/03/08/69ac5618373fc.webp": {
+      "original": "https://img.xscnet.cn//i/2026/03/08/69ac5618373fc.webp",
+      "roles": [
+        "cover"
+      ],
+      "width": 1376,
+      "height": 768,
+      "variants": [
+        {
+          "src": "/_optimized/13e604fe5ae474a5-420w.webp",
+          "width": 420,
+          "height": 234,
+          "bytes": 20868
+        },
+        {
+          "src": "/_optimized/96906e615cba11a3-768w.webp",
+          "width": 768,
+          "height": 429,
+          "bytes": 46614
+        },
+        {
+          "src": "/_optimized/9a33904749c62203-1200w.webp",
+          "width": 1200,
+          "height": 670,
+          "bytes": 72900
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/03/25/69c3a346b617f.webp": {
+      "original": "https://img.xscnet.cn//i/2026/03/25/69c3a346b617f.webp",
+      "roles": [
+        "cover"
+      ],
+      "width": 1600,
+      "height": 840,
+      "variants": [
+        {
+          "src": "/_optimized/dc77e3b557208037-420w.webp",
+          "width": 420,
+          "height": 220,
+          "bytes": 6328
+        },
+        {
+          "src": "/_optimized/aeb134b4f23ad852-768w.webp",
+          "width": 768,
+          "height": 403,
+          "bytes": 13594
+        },
+        {
+          "src": "/_optimized/1793e4c46208fbaf-1200w.webp",
+          "width": 1200,
+          "height": 630,
+          "bytes": 19852
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/03/29/69c8c6ac766bb.png": {
+      "original": "https://img.xscnet.cn//i/2026/03/29/69c8c6ac766bb.png",
+      "roles": [
+        "cover"
+      ],
+      "width": 1600,
+      "height": 840,
+      "variants": [
+        {
+          "src": "/_optimized/e7ea78989e97c1d5-420w.webp",
+          "width": 420,
+          "height": 221,
+          "bytes": 8938
+        },
+        {
+          "src": "/_optimized/dd56fdc1f806613b-768w.webp",
+          "width": 768,
+          "height": 403,
+          "bytes": 20064
+        },
+        {
+          "src": "/_optimized/c1177dfcd5ff84ec-1200w.webp",
+          "width": 1200,
+          "height": 630,
+          "bytes": 33186
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/04/04/69cfe43350f0d.png": {
+      "original": "https://img.xscnet.cn//i/2026/04/04/69cfe43350f0d.png",
+      "roles": [
+        "cover"
+      ],
+      "width": 1600,
+      "height": 840,
+      "variants": [
+        {
+          "src": "/_optimized/6857360f553964e0-420w.webp",
+          "width": 420,
+          "height": 221,
+          "bytes": 10008
+        },
+        {
+          "src": "/_optimized/f1f9162a53caa7c1-768w.webp",
+          "width": 768,
+          "height": 403,
+          "bytes": 20954
+        },
+        {
+          "src": "/_optimized/d53f7b4a8b7a6cff-1200w.webp",
+          "width": 1200,
+          "height": 630,
+          "bytes": 32976
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/04/18/69e399072906e.png": {
+      "original": "https://img.xscnet.cn//i/2026/04/18/69e399072906e.png",
+      "roles": [
+        "cover"
+      ],
+      "width": 1920,
+      "height": 1080,
+      "variants": [
+        {
+          "src": "/_optimized/3437aa373fa375ee-420w.webp",
+          "width": 420,
+          "height": 236,
+          "bytes": 6284
+        },
+        {
+          "src": "/_optimized/d5d84e2611d2e195-768w.webp",
+          "width": 768,
+          "height": 432,
+          "bytes": 14016
+        },
+        {
+          "src": "/_optimized/dc656636493cac4c-1200w.webp",
+          "width": 1200,
+          "height": 675,
+          "bytes": 26094
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/04/20/69e5fa1fcd216.png": {
+      "original": "https://img.xscnet.cn//i/2026/04/20/69e5fa1fcd216.png",
+      "roles": [
+        "cover"
+      ],
+      "width": 1000,
+      "height": 500,
+      "variants": [
+        {
+          "src": "/_optimized/2de3956f78099ae4-420w.webp",
+          "width": 420,
+          "height": 210,
+          "bytes": 12172
+        },
+        {
+          "src": "/_optimized/e621aa7e1c191ed6-768w.webp",
+          "width": 768,
+          "height": 384,
+          "bytes": 23866
+        },
+        {
+          "src": "/_optimized/7941e0a361fbe848-1000w.webp",
+          "width": 1000,
+          "height": 500,
+          "bytes": 31650
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/05/02/69f6192d7751b.webp": {
+      "original": "https://img.xscnet.cn//i/2026/05/02/69f6192d7751b.webp",
+      "roles": [
+        "cover"
+      ],
+      "width": 3840,
+      "height": 2160,
+      "variants": [
+        {
+          "src": "/_optimized/f2b83b7be17abb61-420w.webp",
+          "width": 420,
+          "height": 236,
+          "bytes": 13918
+        },
+        {
+          "src": "/_optimized/d217fefc676acce4-768w.webp",
+          "width": 768,
+          "height": 432,
+          "bytes": 29944
+        },
+        {
+          "src": "/_optimized/6f188e227778b9a8-1200w.webp",
+          "width": 1200,
+          "height": 675,
+          "bytes": 53972
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/06/27/6a3ebd3692f38.png": {
+      "original": "https://img.xscnet.cn//i/2026/06/27/6a3ebd3692f38.png",
+      "roles": [
+        "cover"
+      ],
+      "width": 2732,
+      "height": 1534,
+      "variants": [
+        {
+          "src": "/_optimized/c82170eb9afc3069-420w.webp",
+          "width": 420,
+          "height": 236,
+          "bytes": 24960
+        },
+        {
+          "src": "/_optimized/1206fb461288ebb1-768w.webp",
+          "width": 768,
+          "height": 431,
+          "bytes": 74390
+        },
+        {
+          "src": "/_optimized/b0051a76745cffc9-1200w.webp",
+          "width": 1200,
+          "height": 674,
+          "bytes": 159320
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/06/30/6a429f7593795.jpg": {
+      "original": "https://img.xscnet.cn//i/2026/06/30/6a429f7593795.jpg",
+      "roles": [
+        "cover"
+      ],
+      "width": 2732,
+      "height": 1534,
+      "variants": [
+        {
+          "src": "/_optimized/cc8fd6fe53e6664e-420w.webp",
+          "width": 420,
+          "height": 236,
+          "bytes": 24254
+        },
+        {
+          "src": "/_optimized/23198d038cb95290-768w.webp",
+          "width": 768,
+          "height": 431,
+          "bytes": 63624
+        },
+        {
+          "src": "/_optimized/296d3aee6bbe9cd5-1200w.webp",
+          "width": 1200,
+          "height": 674,
+          "bytes": 120036
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/07/10/6a4ff85bbc024.jpg": {
+      "original": "https://img.xscnet.cn//i/2026/07/10/6a4ff85bbc024.jpg",
+      "roles": [
+        "cover"
+      ],
+      "width": 4032,
+      "height": 3024,
+      "variants": [
+        {
+          "src": "/_optimized/3748904299b781f6-420w.webp",
+          "width": 420,
+          "height": 315,
+          "bytes": 18318
+        },
+        {
+          "src": "/_optimized/ed9d7bb851917aa1-768w.webp",
+          "width": 768,
+          "height": 576,
+          "bytes": 51708
+        },
+        {
+          "src": "/_optimized/94a04a4c0d7dbdb9-1200w.webp",
+          "width": 1200,
+          "height": 900,
+          "bytes": 109510
+        }
+      ]
+    },
+    "https://img.xscnet.cn//i/2026/07/16/6a57c5d7a2f73.jpg": {
+      "original": "https://img.xscnet.cn//i/2026/07/16/6a57c5d7a2f73.jpg",
+      "roles": [
+        "cover"
+      ],
+      "width": 1672,
+      "height": 941,
+      "variants": [
+        {
+          "src": "/_optimized/a776cc77819caec3-420w.webp",
+          "width": 420,
+          "height": 236,
+          "bytes": 14616
+        },
+        {
+          "src": "/_optimized/56995b35b89b3355-768w.webp",
+          "width": 768,
+          "height": 432,
+          "bytes": 41780
+        },
+        {
+          "src": "/_optimized/6b697fdefe167ea4-1200w.webp",
+          "width": 1200,
+          "height": 675,
+          "bytes": 89328
+        }
+      ]
+    }
+  }
+}

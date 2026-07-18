@@ -287,7 +287,15 @@ items:
     cover: https://img.xscnet.cn//i/2025/10/30/69035cbe1c946.webp
     date: '2025-05-24T00:00:00.000Z'
     updated: '2025-05-26T00:00:00.000Z'
-    excerpt: ">## 📅 五月总结  \n\n这次的经历让我心情很是愉悦呢~  \n**2025年5月24日 -- 心情晴**  \n<meting-js\n\tserver=\"netease\"\n\ttype=\"song\"\n\tid=\"1974443815\"\n  mode=\"circulation\">\n</meting-js>\n\n>### 🎵 "
+    excerpt: |2-
+         
+                  
+                            
+                      
+                         
+                                                                   
+                     
+           
     categories:
       - 月总结
     tags:
@@ -406,16 +414,23 @@ items:
     cover: https://img.xscnet.cn//i/2026/06/27/6a3f88841dc57.png
     date: '2025-04-15T00:00:00.000Z'
     updated: '2025-04-15T00:00:00.000Z'
-    excerpt: |-
+    excerpt: |2-
+         
+                  
+                
+                      
+                         
+                    
+           
+            
+         
       ::: zh-CN
 
       许久不见各位  
       报个平安  
       最近安然无恙  
       ### 最近的项目
-      最近开发了几个适配这个Yun主题的Vue插件  
-
-      [点我查看valaxy-yun-external-link的Github仓库](https://github.com/mete0rxsc/valaxy-yun-external
+      最近开发了几个适配这个Yun主题的
     categories:
       - 日常
     tags:
@@ -427,15 +442,20 @@ items:
     cover: https://img.xscnet.cn//i/2026/06/27/6a3f88841dc57.png
     date: '2025-04-14T00:00:00.000Z'
     updated: '2025-04-14T00:00:00.000Z'
-    excerpt: >-
+    excerpt: |2-
+         
+                  
+                                     
+                      
+                         
+                    
+           
+            
+         
       ::: zh-CN
 
-
       ## 视频教程
-
-      <iframe
-      src="//player.bilibili.com/player.html?114336626379312&bvid=BV1a2o7Y9E2V&cid=29414262604&p=1&high_quality=1&danmaku=1&autoplay=0"
-      scr
+      <iframe src="//player.b
     categories:
       - 教程
     tags:
@@ -447,7 +467,18 @@ items:
     cover: https://img.xscnet.cn//i/2026/06/27/6a3f88841dc57.png
     date: '2025-04-06T23:47:08.000Z'
     updated: '2025-04-06T23:47:08.000Z'
-    excerpt: "<audio controls>\n<source src=\"/audio/Enzalla - Lullaby.wav\" type=\"audio/mpeg\">\n您的浏览器不支持音频元素。\n</audio>\n因为这首歌是VIP，不支持完整播放，所以我直接上传到本地了\n<meting-js\n\tserver=\"netease\""
+    excerpt: |2-
+         
+                  
+                    
+                               
+                                  
+                    
+           
+              
+         
+      <audio controls>
+      <source src="/audio/En
     categories:
       - 日记
     tags:
@@ -459,14 +490,14 @@ items:
     cover: https://imgse.koxiuqiu.cc/imgse/u/23/2025/04/25/680b89336a184.webp
     date: '2025-04-03T00:00:00.000Z'
     updated: '2025-04-03T00:00:00.000Z'
-    excerpt: >-
-      ::: zh-CN
-
-      >## 视频教程：
-
-      <iframe
-      src="//player.bilibili.com/player.html?114274684897948&bvid=BV1FiZUYdEcV&cid=29220537022&p=1&high_quality=1&danmaku=1&autoplay=0"
-      sc
+    excerpt: |2-
+         
+                  
+                            
+                      
+                         
+                                                                               
+               
     categories:
       - 教程
     tags:
@@ -479,7 +510,16 @@ items:
     cover: https://img.xscnet.cn//i/2026/06/27/6a3f88841dc57.png
     date: '2025-03-29T00:00:00.000Z'
     updated: '2025-03-29T00:00:00.000Z'
-    excerpt: |-
+    excerpt: |2-
+         
+                  
+                   
+                      
+                         
+                      
+           
+              
+         
       ::: zh-CN
 
       《三月雪笺》
@@ -487,14 +527,7 @@ items:
       银绦漫舞锁春申，  
       玉盏噙香待故人。  
       松影量风拂旧雪，  
-      冰棱垂泪绣新痕。  
-      :::
-
-      ::: en
-
-      Chinese poetry does not provide English translation, please be aware
-
-      ::: 
+      冰棱垂泪
     categories:
       - 诗和远方
     tags:
@@ -506,7 +539,16 @@ items:
     cover: https://img.xscnet.cn//i/2026/06/27/6a3f88841dc57.png
     date: '2025-03-29T00:00:00.000Z'
     updated: '2025-03-29T00:00:00.000Z'
-    excerpt: |-
+    excerpt: |2-
+         
+                  
+                
+                      
+                         
+                      
+           
+              
+         
       ::: zh-CN
 
       《茧》
@@ -516,22 +558,7 @@ items:
       年轮的褶皱  
 
       我等你舌尖的盐  
-      在暮色结晶  
-      等二十四封信  
-      被潮声蛀空  
-      月光正拆解  
-      每一粒沙的堤岸  
-
-      黄昏在指缝崩塌七次之后  
-      我们的名字  
-      仍卡在春天的喉间  
-      发不出芽  
-
-      :::
-
-      ::: en
-
-      Chines
+      在暮色
     categories:
       - 诗和远方
     tags:
@@ -543,15 +570,14 @@ items:
     cover: https://imgse.koxiuqiu.cc/imgse/u/23/2025/04/25/680b8c5b24c5a.webp
     date: '2025-03-29T00:00:00.000Z'
     updated: '2025-03-29T00:00:00.000Z'
-    excerpt: |-
-      ::: zh-CN
-
-      ---
-
-      # 2025年3月29日 春雪记事  
-      三月的最后一周，空气里依然裹着冬天的尾巴。教室窗台上的冰凌悄悄生长，折射着北方少年眼中的奇妙三月。  
-      这本该是柳枝抽芽的时节，此刻窗外却在上演另一番景象：  
-      ![1](https://imgse.koxiuqiu.cc/imgse/u/23/2
+    excerpt: |2
+         
+                  
+                     
+                      
+                         
+                                                                               
+                     
     categories:
       - 月总结
     tags:
@@ -564,7 +590,16 @@ items:
     cover: https://imgse.koxiuqiu.cc/imgse/u/23/2025/03/27/67e55e7be5530.jpg
     date: '2025-03-27T00:00:00.000Z'
     updated: '2025-03-27T00:00:00.000Z'
-    excerpt: "::: zh-CN\n\n推荐搭配此音乐食用，风味更佳\n<meting-js\n\tserver=\"netease\"\n\ttype=\"song\"\n\tid=\"1974443814\"\n  mode=\"circulation\">\n</meting-js>\n\n✦\n\n# 2025/3/27 ｜ 📅 开心の日\n🕊️ 情绪温度：36.5°"
+    excerpt: |2-
+         
+                  
+                
+                      
+                         
+                                                                              
+                    
+           
+       
     categories:
       - 日常
     tags:
@@ -577,7 +612,15 @@ items:
     cover: https://imgse.koxiuqiu.cc/imgse/u/23/2025/04/25/680b893d71229.webp
     date: '2025-03-25T00:00:00.000Z'
     updated: '2025-03-25T00:00:00.000Z'
-    excerpt: "::: zh-CN\n\n推荐搭配此音乐食用，风味更佳\n<meting-js\n\tserver=\"netease\"\n\ttype=\"song\"\n\tid=\"1992712131\"\n  mode=\"circulation\">\n</meting-js>\n\n## 2025/03/26 东北春雪絮语：一个高二学生的建站手记  \n\n###"
+    excerpt: |2
+         
+                  
+                
+                      
+                         
+                    
+                                                                               
+           
     categories:
       - 日常
     tags:
@@ -589,15 +632,19 @@ items:
     cover: https://img.xscnet.cn//i/2026/06/27/6a3f88841dc57.png
     date: '2025-03-22T00:00:00.000Z'
     updated: '2025-03-22T00:00:00.000Z'
-    excerpt: |-
+    excerpt: |2-
+         
+                  
+                
+                      
+                         
+                    
+           
+            
+         
       ::: zh-CN
       ## 高二下学期开学一个月了
-      一转眼，高二下学习已经开学一个月了，我想象中的那种繁忙没有出现，只是学习进度在加快  
-      我甚至还有闲心上课摸鱼（bushi  
-      其实我打小对学习我自己不感兴趣的知识是犯抵触心理的，但是我现在似乎可以听进去一点了！这是一个进步呢
-
-      ## 未来
-      最近在和同学唠嗑的过程中谈到
+      一转眼，高二下学习已经开学一个月了，我想象中的那种繁忙没有出现，只是学习进度
     categories:
       - 日常
     tags:
@@ -609,13 +656,20 @@ items:
     cover: https://img.xscnet.cn//i/2026/06/27/6a3f88841dc57.png
     date: '2024-12-22T00:00:00.000Z'
     updated: '2024-12-22T00:00:00.000Z'
-    excerpt: |-
+    excerpt: |2-
+         
+                  
+                       
+                      
+                         
+                    
+           
+            
+         
       ::: zh-CN
 
       ## 浅谈我对个人博客的看法
-      ### 宇宙级免责声明：我说的内容仅表达我自己的看法，我尊重任何人的劳动成果，尊重任何人的选择
-      我认为一个人的个人博客，最重要的是记录自己的日常吧，感觉过多的进行技术类分享，不会有特别多人在博客里过多的浏览文章，反而是浏览完自己需要的文章之后就退出了  
-      对我来说，我
+      ### 宇宙级免责声明：我说的内容仅表达我自己的看法，我尊重
     categories:
       - 随笔
     tags:
@@ -627,16 +681,22 @@ items:
     cover: https://img.xscnet.cn//i/2026/06/27/6a3f88841dc57.png
     date: '2024-06-18T00:00:00.000Z'
     updated: '2024-06-18T00:00:00.000Z'
-    excerpt: |-
+    excerpt: |2-
+         
+                  
+                  
+                      
+                         
+                    
+           
+            
+            
+            
+         
       ::: zh-CN
 
       ## 我的博客基本竣工啦！
-      北京时间23点04分，我刚刚上完外教课，有点累，但是还是掩饰不住我内心的喜悦
-      虽然最近一些烦心的事情比较多，但是在这一刻终究还是开心的
-      最近在学校里好多烦心事
-
-      ## 学校的烦心事
-      1. 这个破学校每天要求我们穿那个丑的要死的校服，每周一还要检查我们的头发是否合格，不合
+      北京时间23点04分，我刚刚上完外教课，有点
     categories:
       - 更新
     tags:
@@ -650,15 +710,21 @@ items:
     cover: https://img.xscnet.cn//i/2026/06/27/6a3f88841dc57.png
     date: '2024-02-16T00:00:00.000Z'
     updated: '2024-02-16T00:00:00.000Z'
-    excerpt: |-
+    excerpt: |2-
+         
+                  
+                                   
+                      
+                         
+                    
+           
+            
+         
       ::: zh-CN
 
       ## 重大更新!我的博客全面换为Valaxy框架!
 
-      ##### Q1:原先的博客是不能访问了吗？
-      A1:当然不是！我在这P个超链接[点我可以直接回到原先的博客，但不会继续更新](https://blog.xscnas.top:9088)
-
-      ##### Q2:不都是博客吗，费这么大劲，有什么区别？
+      ##### 
     categories:
       - 更新
     tags:

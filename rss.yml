@@ -3,10 +3,27 @@ description: Mete0r的虚拟小世界
 author: Mete0r
 site: https://www.xscnet.cn/
 home: https://xscnet.cn/
-updated: '2026-07-16T00:00:00.000Z'
+updated: '2026-08-26T00:00:00.000Z'
 items:
+  - title: 8月小结 | 博客更新方向意见征求
+    headline: 8月小结 | 博客更新方向意见征求
+    caption: Humm~博客要怎么更新更好呢~
+    link: https://www.xscnet.cn/posts/p4320260826/
+    cover: https://img.xscnet.cn//i/2026/08/26/6a8effeae1cc8.png
+    date: '2026-08-26T00:00:00.000Z'
+    updated: '2026-08-26T00:00:00.000Z'
+    excerpt: >-
+      博主近期许久没有更新博客，本次发文先是说明已修复一处友链提交恶性Bug：Upstash免费Redis长时间无活动被清空，后端无法连接数据库造成限流报错。接着向大家求助解决方案，开学离家后家里自建图床一旦断网，缺少内网环境难以远程重启恢复。同时开放征集博客主题美化优化意见。闲暇之余和好友游玩我的世界新版本，耗费精力优化了红石音乐，最后透露自己的新人物形象版权已经到手。
+    categories:
+      - 博客
+    tags:
+      - 博客
+      - 主题开发
+      - 游戏
+    readingTime: 3
   - title: 更新简报01
     headline: 更新简报01
+    caption: 从零开发主题真的好累啊~~
     link: https://www.xscnet.cn/posts/p4220260716/
     cover: https://img.xscnet.cn//i/2026/07/16/6a57c5d7a2f73.jpg
     date: '2026-07-16T00:00:00.000Z'

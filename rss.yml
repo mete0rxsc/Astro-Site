@@ -3,8 +3,25 @@ description: Mete0r的虚拟小世界
 author: Mete0r
 site: https://www.xscnet.cn/
 home: https://xscnet.cn/
-updated: '2026-08-26T00:00:00.000Z'
+updated: '2026-09-02T00:00:00.000Z'
 items:
+  - title: 记一次紧急业务割接 | Lsky图床炸了！
+    headline: 记一次紧急业务割接 | Lsky图床炸了！
+    caption: Lsky备份恢复步骤
+    link: https://www.xscnet.cn/posts/p4420260902/
+    cover: https://img.xscnet.cn//i/2026/09/02/6a9804d55c621.png
+    date: '2026-09-02T00:00:00.000Z'
+    updated: '2026-09-02T00:00:00.000Z'
+    excerpt: >-
+      本文记录了一次紧急 Lsky 图床业务割接实操经历。因家用 OpenWRT 软路由 R8169 网卡存在驱动故障，开机无法获取内网 IP，导致原图床服务彻底断连。为保障图床业务正常运行，作者将 Lsky 图床从软路由
+      Docker 容器迁移至本地 AI 算力机。详细梳理了故障发生到业务恢复的完整时间线，分享了通过工具迁移图片存储数据、使用 DBeaver 迁移 MySQL
+      数据库的完整实操步骤，同时总结本次踩坑经验，着重强调**数据云端备份**的重要性，提醒运维切勿忽视数据备份与生产环境规范运维。
+    categories:
+      - 服务器
+    tags:
+      - 博客
+      - 服务器
+    readingTime: 4
   - title: 8月小结 | 博客更新方向意见征求
     headline: 8月小结 | 博客更新方向意见征求
     caption: Humm~博客要怎么更新更好呢~
@@ -21,23 +38,6 @@ items:
       - 主题开发
       - 游戏
     readingTime: 3
-  - title: 记一次紧急业务割接 | Lsky图床炸了！
-    headline: 记一次紧急业务割接 | Lsky图床炸了！
-    caption: Lsky备份恢复步骤
-    link: https://www.xscnet.cn/posts/p4420260902/
-    cover: https://img.xscnet.cn//i/2026/09/02/6a9804d55c621.png
-    date: '2026-08-26T00:00:00.000Z'
-    updated: '2026-08-26T00:00:00.000Z'
-    excerpt: >-
-      本文记录了一次紧急 Lsky 图床业务割接实操经历。因家用 OpenWRT 软路由 R8169 网卡存在驱动故障，开机无法获取内网 IP，导致原图床服务彻底断连。为保障图床业务正常运行，作者将 Lsky 图床从软路由
-      Docker 容器迁移至本地 AI 算力机。详细梳理了故障发生到业务恢复的完整时间线，分享了通过工具迁移图片存储数据、使用 DBeaver 迁移 MySQL
-      数据库的完整实操步骤，同时总结本次踩坑经验，着重强调**数据云端备份**的重要性，提醒运维切勿忽视数据备份与生产环境规范运维。
-    categories:
-      - 服务器
-    tags:
-      - 博客
-      - 服务器
-    readingTime: 4
   - title: 更新简报01
     headline: 更新简报01
     caption: 从零开发主题真的好累啊~~

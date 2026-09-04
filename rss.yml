@@ -21,7 +21,7 @@ items:
     tags:
       - 博客
       - 服务器
-    readingTime: 4
+    readingTime: 3
   - title: 8月小结 | 博客更新方向意见征求
     headline: 8月小结 | 博客更新方向意见征求
     caption: Humm~博客要怎么更新更好呢~
@@ -37,7 +37,7 @@ items:
       - 博客
       - 主题开发
       - 游戏
-    readingTime: 3
+    readingTime: 2
   - title: 更新简报01
     headline: 更新简报01
     caption: 从零开发主题真的好累啊~~
@@ -55,7 +55,7 @@ items:
       - Astro
       - 主题开发
       - 更新
-    readingTime: 4
+    readingTime: 2
   - title: 香港三日游 | 独特的体验
     headline: 香港三日游 | 独特的体验
     caption: 为什么南方的热是魔法攻击啊喂！
@@ -72,7 +72,7 @@ items:
       - 生活
       - 旅行
       - 香港
-    readingTime: 4
+    readingTime: 3
   - title: 新的博客框架！全量上线！
     headline: 新的博客框架！全量上线！
     caption: 基于Astro的Mete0r专用主题上线啦！
@@ -116,7 +116,7 @@ items:
     tags:
       - 个人形象
       - 生活
-    readingTime: 7
+    readingTime: 5
   - title: 游戏体验：《PRAGMATA》(识质存在)
     headline: 游戏体验：《PRAGMATA》(识质存在)
     caption: 体验卡普空的新游戏：《PRAGMATA》(识质存在)
@@ -149,7 +149,7 @@ items:
     tags:
       - 教程
       - 开源项目
-    readingTime: 5
+    readingTime: 3
   - title: 使用Hexo搭建自己的博客
     headline: 使用Hexo搭建自己的博客
     link: https://www.xscnet.cn/posts/p3520260403/
@@ -163,7 +163,7 @@ items:
       - 博客
       - 教学
       - 服务器
-    readingTime: 30
+    readingTime: 10
   - title: 博客源站IP泄露的两种主要方式与防护指南
     headline: 博客源站IP泄露的两种主要方式与防护指南
     link: https://www.xscnet.cn/posts/p3420260329/
@@ -178,7 +178,7 @@ items:
       - 博客
       - 教学
       - 服务器
-    readingTime: 6
+    readingTime: 5
   - title: 三月小记：春雨、体检与博客二三事
     headline: 三月小记：春雨、体检与博客二三事
     link: https://www.xscnet.cn/posts/p3320260325/
@@ -192,7 +192,7 @@ items:
       - 博客
       - 生活
       - 随笔
-    readingTime: 16
+    readingTime: 4
   - title: 近期随笔：对生活的总结和对博客主题的探索
     headline: 近期随笔：对生活的总结和对博客主题的探索
     link: https://www.xscnet.cn/posts/p3220260307/
@@ -208,7 +208,7 @@ items:
       - 博客
       - 生活
       - 随笔
-    readingTime: 11
+    readingTime: 6
   - title: 博客框架更新！
     headline: 博客框架更新！
     link: https://www.xscnet.cn/posts/p3120260303/
@@ -221,7 +221,7 @@ items:
     tags:
       - 博客
       - 更新
-    readingTime: 3
+    readingTime: 2
   - title: 各位，好久不见!
     headline: 各位，好久不见!
     link: https://www.xscnet.cn/posts/p3020260228/
@@ -301,7 +301,7 @@ items:
     categories: []
     tags:
       - 音乐
-    readingTime: 4
+    readingTime: 2
   - title: 2025六月小结:长时间的等待
     headline: 2025六月小结:长时间的等待
     link: https://www.xscnet.cn/posts/p2420250629/
@@ -328,7 +328,7 @@ items:
       - 日常
       - 生活
       - 音乐
-    readingTime: 5
+    readingTime: 4
   - title: 彼方的她-Aliya
     headline: 彼方的她-Aliya
     link: https://www.xscnet.cn/posts/p2220250518/
@@ -343,7 +343,7 @@ items:
       - GalGame
       - 佳作推荐
       - Aliya
-    readingTime: 7
+    readingTime: 6
   - title: Believe
     headline: Believe
     link: https://www.xscnet.cn/posts/p2120250511/
@@ -356,7 +356,7 @@ items:
       - 音乐
     tags:
       - 音乐
-    readingTime: 3
+    readingTime: 2
   - title: 2025四月小结
     headline: 2025四月小结
     link: https://www.xscnet.cn/posts/p1920250501/
@@ -382,7 +382,7 @@ items:
       - 教程
     tags:
       - 教程
-    readingTime: 3
+    readingTime: 2
   - title: 网易云VIP歌曲解析
     headline: 网易云VIP歌曲解析
     link: https://www.xscnet.cn/posts/p1820250427/
@@ -395,7 +395,7 @@ items:
     tags:
       - 教程
       - GitHub
-    readingTime: 2
+    readingTime: 1
   - title: 好用的开源项目
     headline: 好用的开源项目
     link: https://www.xscnet.cn/posts/p1720250426Links/
@@ -454,7 +454,7 @@ items:
       - 日常
     tags:
       - 日常
-    readingTime: 3
+    readingTime: 2
   - title: Valaxy Yun External Link
     headline: Valaxy Yun External Link
     link: https://www.xscnet.cn/posts/p1320250414/
@@ -474,7 +474,7 @@ items:
       - 教程
     tags:
       - 教程
-    readingTime: 4
+    readingTime: 3
   - title: Lullaby
     headline: Lullaby
     link: https://www.xscnet.cn/posts/p1220250406/
@@ -506,7 +506,7 @@ items:
     tags:
       - 教程
       - Valaxy
-    readingTime: 11
+    readingTime: 4
   - title: 《三月雪笺》
     headline: 《三月雪笺》
     link: https://www.xscnet.cn/posts/p10pm220250329/
@@ -591,7 +591,7 @@ items:
     tags:
       - 月总结
       - 生活
-    readingTime: 5
+    readingTime: 4
   - title: (三)
     headline: (三)
     link: https://www.xscnet.cn/posts/p720250327/
@@ -604,7 +604,7 @@ items:
     tags:
       - 日常
       - 开心的发癫
-    readingTime: 4
+    readingTime: 3
   - title: （二）
     headline: （二）
     link: https://www.xscnet.cn/posts/p620250325/

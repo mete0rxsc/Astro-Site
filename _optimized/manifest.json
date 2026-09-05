@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-09-05T12:40:50.844Z",
+  "generatedAt": "2026-09-05T15:29:52.009Z",
   "images": {
     "https://img.xscnet.cn//i/2026/06/28/6a40e72d6a01e.jpg": {
       "original": "https://img.xscnet.cn//i/2026/06/28/6a40e72d6a01e.jpg",
@@ -24,25 +24,25 @@
         }
       ]
     },
-    "https://img.xscnet.cn//i/2026/04/15/69df23fa386ef.png": {
-      "original": "https://img.xscnet.cn//i/2026/04/15/69df23fa386ef.png",
+    "https://img.xscnet.cn//i/2026/09/05/6a9c34fa15e97.png": {
+      "original": "https://img.xscnet.cn//i/2026/09/05/6a9c34fa15e97.png",
       "roles": [
         "avatar"
       ],
-      "width": 1024,
-      "height": 1024,
+      "width": 1254,
+      "height": 1254,
       "variants": [
         {
-          "src": "/_optimized/ed360653312b3448-48w.webp",
+          "src": "/_optimized/f86ff075869c2b5d-48w.webp",
           "width": 48,
           "height": 48,
-          "bytes": 1738
+          "bytes": 2136
         },
         {
-          "src": "/_optimized/8e1a6faf6c8a2217-96w.webp",
+          "src": "/_optimized/76d1cb2a2109d800-96w.webp",
           "width": 96,
           "height": 96,
-          "bytes": 4264
+          "bytes": 5704
         }
       ]
     },

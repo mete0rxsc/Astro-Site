@@ -3,8 +3,22 @@ description: Mete0r的虚拟小世界
 author: Mete0r
 site: https://www.xscnet.cn/
 home: https://xscnet.cn/
-updated: '2026-09-02T00:00:00.000Z'
+updated: '2026-10-08T00:00:00.000Z'
 items:
+  - title: 在本地部署小型LLM模型及对公网开放
+    headline: 在本地部署小型LLM模型及对公网开放
+    caption: 需要ubuntu呦~
+    link: https://www.xscnet.cn/posts/p4520261008/
+    cover: https://img.xscnet.cn//i/2026/10/09/6ac7cd2c9c091.png
+    date: '2026-10-08T00:00:00.000Z'
+    updated: '2026-10-08T00:00:00.000Z'
+    excerpt: >-
+      本文介绍作者在 Ubuntu 系统，使用 RTX2060 Super 8G 显卡，借助 Ollama 部署 Qwen2.5:7b-instruct 小型大模型的完整流程。包含 NVIDIA
+      驱动安装、防止驱动版本错配、Ollama 部署，搭配 AxonHub 与 1Panel 做公网鉴权，通过 FRP 内网穿透、CDN 暴露公网，生成 API 密钥对外提供本地模型服务。
+    categories: []
+    tags:
+      - AI
+    readingTime: 4
   - title: 记一次紧急业务割接 | Lsky图床炸了！
     headline: 记一次紧急业务割接 | Lsky图床炸了！
     caption: Lsky备份恢复步骤

@@ -3,8 +3,23 @@ description: Mete0r的虚拟小世界
 author: Mete0r
 site: https://www.xscnet.cn/
 home: https://xscnet.cn/
-updated: '2026-10-08T00:00:00.000Z'
+updated: '2026-11-06T00:00:00.000Z'
 items:
+  - title: 11月小结 | 正式步入大学生活
+    headline: 11月小结 | 正式步入大学生活
+    caption: 大学好苦，我要回家！
+    link: https://www.xscnet.cn/posts/p4620261106/
+    cover: https://img.xscnet.cn//i/2026/11/06/6aeda891942b8.png
+    date: '2026-11-06T00:00:00.000Z'
+    updated: '2026-11-06T00:00:00.000Z'
+    excerpt: >-
+      作者记录了十一月的大学生活，前往吉林农业大学观摩赛博杯人工智能大赛，见识了机器狗、全地形车等参赛项目，期待明年参赛。宿舍环境却让作者十分困扰，二手烟、深夜噪音、卫生问题接踵而至，正纠结是否租房。设备已配齐，博客更新放缓但不会停更，盼着能摆脱糟糕的住宿环境。
+    categories:
+      - 大学
+    tags:
+      - 大学
+      - 比赛
+    readingTime: 4
   - title: 在本地部署小型LLM模型及对公网开放
     headline: 在本地部署小型LLM模型及对公网开放
     caption: 需要ubuntu呦~
